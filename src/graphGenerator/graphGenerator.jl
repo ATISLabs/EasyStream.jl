@@ -12,20 +12,19 @@ Variable `pred` contains the model that will be used to determined the spacial c
 """
 function distributionByClass(model, fitresult, xg, yg, X, predicted_y; colors = [:pink, :lightblue])
     pred(x, y) = convert(Int64, predict(model, fitresult, [x, y]))
-    var = heatmap(xg, yg, pred, c=cgrad(colors))
+    graph = heatmap(xg, yg, pred, c=cgrad(colors))
     scatter!(X[:,1], X[:,2], c=Array{Int64}(predicted_y), palette = colors, leg=false)
-    return var
+    return graph
 end
 
 function distributionByClass(model, fitresult, X, predicted_y; colors = [:pink, :lightblue], granularity = 50)
-
     pred(x, y) = convert(Int64, predict(model, fitresult, [x, y]))
-    xg = range(minimum(stream.samples[:,1]), maximum(stream.samples[:,1]), length = granularity)
-    yg = range(minimum(stream.samples[:,2]), maximum(stream.samples[:,2]), length = granularity)
+    xg = range(minimum(X[:,1]), maximum(X[:,1]), length = granularity)
+    yg = range(minimum(X[:,2]), maximum(X[:,2]), length = granularity)
 
-    var = heatmap(xg, yg, pred, c=cgrad(colors))
+    graph = heatmap(xg, yg, pred, c=cgrad(colors))
     scatter!(X[:,1], X[:,2], c=Array{Int64}(predicted_y), palette = colors, leg=false)
-    return var
+    return graph
 end
 
 """
