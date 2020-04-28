@@ -1,6 +1,20 @@
+function run(stream::Stream, model::T) where {T <: Deterministic}
+    println("Stream")
+    fit_result, _, _ = fit(classifier, 0, stream.samples[1:stream.n_avaiable_labels, :], stream.labels[1:stream.n_avaiable_labels, :])
+    return update_predict(model, fit_result stream.samples[stream.n_avaiable_labels+1:end, :], stream.labels[stream.n_avaiable_labels+1:end, :])
+end
+
+function run(stream::Stream, model::T) where {T <: MLJBase.Deterministic}
+    println("MLJBase")
+    MLJBase.machine(model, stream.samples, stream.labels)
+    MLJBase.fit!(model, rows=1:stream.n_avaiable_labels)
+    return MLJBase.predict(model, row=stream.n_avaiable_labels+1:length(stream.labels)-stream.n_avaiable_labels)
+end
+
+#=
 function run(stream::Stream, classifier)
+next_amount = 0
     amount = 1 + stream.n_avaiable_labels
-    next_amount = 0
     iterations = floor((nrows(stream.samples) - stream.n_avaiable_labels) / stream.window_size)
     predicted_y = Array{CategoricalValue{}, 1}()
 
@@ -31,3 +45,4 @@ function run(stream::Stream, classifier)
     #teste = coerce(predicted_y, Multiclass{})
     return CategoricalArray{}(predicted_y)
 end
+=#

@@ -54,12 +54,16 @@ function evaluate(streams, models; measures = accuracy, output = :table, header 
 
         ###Classification
         for (k, model) in enumerate(models)
-            amount = 1 + stream.n_avaiable_labels
+            #amount = 1 + stream.n_avaiable_labels
 
+            append!(predicted_ys[k], run(stream, model))
+            #=
             ###Model initialization
             fitresult, _, _ = MLJModels.fit(model, 0, stream.samples[1:stream.n_avaiable_labels, :], stream.labels[1:stream.n_avaiable_labels, :])
 
+
             ###Creating the needed data to distributionByClass function
+
             if :prequetialDis in output
                 pred(x, y) = convert(Int64, DMClassification.onlyfit(model, fitresult, [x, y]))
                 xg = range(minimum(stream.samples[:,1]), maximum(stream.samples[:,1]), length=50)
@@ -72,14 +76,15 @@ function evaluate(streams, models; measures = accuracy, output = :table, header 
                 X = stream.samples[amount:next_amount, :]
 
                 predicted_y = MLJModels.predict(model, fitresult, stream.samples[amount:next_amount,:])
-
+                #=
                 if :prequetialDis in output
                     push!(r_output.graphs, distributionByClass(xg, yg, X, pred, predicted_y))
                 end
-
+                =#
                 append!(predicted_ys[k], predicted_y)
                 amount = next_amount + 1
             end
+            =#
 
         end
 
