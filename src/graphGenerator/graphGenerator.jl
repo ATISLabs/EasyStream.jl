@@ -29,14 +29,32 @@ end
 function distributionByClass(stream, model; steps = 1, colors = [:pink, :lightblue], granularity = 50)
     fitresult, _, _ = fit(model, 0, stream.samples[1:stream.n_avaiable_labels, :], stream.labels[1:stream.n_avaiable_labels])
     pred(x, y) = convert(Int64, predict(model, fitresult, [x, y]))
+
     X = stream.samples[stream.n_avaiable_labels+1:end, :]
-    predicted_y = stream.labels[stream.n_avaiable_labels+1:end]
     xg = range(minimum(X[:,1]), maximum(X[:,1]), length = granularity)
     yg = range(minimum(X[:,2]), maximum(X[:,2]), length = granularity)
 
-    graph = heatmap(xg, yg, pred, c = cgrad(colors))
-    scatter!(X[:,1], X[:,2], c = Array{Int64}(predicted_y), palette = colors, leg = false)
-    return graph
+    predicted_y = stream.labels[stream.n_avaiable_labels+1:end]
+
+    prequential_interval = interval(length(stream.labels) - stream.n_avaiable_labels, steps)
+
+    graphs = []
+
+    amount = 1 + stream.n_avaiable_labels
+    next_amount = 0
+    for j in 1:steps
+        next_amount = (amount - 1) + prequential_interval[j]
+        X = stream.samples[amount:next_amount, :]
+
+        predicted_y = MLJModels.predict(model, fitresult, stream.samples[amount:next_amount,:])
+        push!(graphs, heatmap(xg, yg, pred, c = cgrad(colors)))
+        scatter!(X[amount:next_amount, 1], X[amount:next_amount, 2], c = Array{Int64}(predicted_y), palette = colors, leg = false)
+        amount = next_amount + 1
+    end
+    anim = @animate for i in 1:length(graphs)
+        plot(graphs[i])
+    end
+    return anim
 end
 """
     prequentialAnalyze(ŷ, y, steps, meansure)
