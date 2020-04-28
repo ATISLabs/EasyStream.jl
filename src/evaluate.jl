@@ -58,7 +58,9 @@ function evaluate(streams, models; measures = accuracy, output = :table, header 
             if model isa Deterministic
                 append!(predicted_ys[k], runS(stream, model))
             elseif model isa MLJBase.Deterministic
-                append!(predicted_ys[k], runM(stream, model))
+                append!(predicted_ys[k], runMD(stream, model))
+            elseif model isa MLJBase.Probabilistic
+                append!(predicted_ys[k], runMP(stream, model))
             end
             #=
             ###Model initialization

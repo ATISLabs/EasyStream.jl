@@ -1,14 +1,19 @@
 function runS(stream::Stream, model)
-    println("Stream")
     fit_result, _, _ = fit(model, 0, stream.samples[1:stream.n_avaiable_labels, :], stream.labels[1:stream.n_avaiable_labels, :])
     return updatePredict(model, fit_result, stream.samples[stream.n_avaiable_labels+1:end, :])
 end
 
-function runM(stream::Stream, model)
-    println("MLJBase")
+function runMD(stream::Stream, model)
+
     MLJBase.machine(model, stream.samples, stream.labels)
     MLJBase.fit!(model, rows=1:stream.n_avaiable_labels)
     return MLJBase.predict(model, row=stream.n_avaiable_labels+1:length(stream.labels)-stream.n_avaiable_labels)
+end
+
+function runMP(stream::Stream, model)
+    MLJBase.machine(model, stream.samples, stream.labels)
+    MLJBase.fit!(model, rows=1:stream.n_avaiable_labels)
+    return MLJBase.predict_mode(model, row=stream.n_avaiable_labels+1:length(stream.labels)-stream.n_avaiable_labels)
 end
 
 #=
