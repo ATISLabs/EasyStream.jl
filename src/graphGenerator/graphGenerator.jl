@@ -27,7 +27,7 @@ function distributionByClass(model, fitresult, X, predicted_y; colors = [:pink, 
 end
 
 function distributionByClass(stream, model; steps = 1, colors = [:pink, :lightblue], granularity = 50)
-    fitresult, _, _ = fit(model, 0, stream.samples[1:stream.n_avaiable_labels], stream.labels[1:stream.n_avaiable_labels])
+    fitresult, _, _ = fit(model, 0, stream.samples[1:stream.n_avaiable_labels, :], stream.labels[1:stream.n_avaiable_labels])
     pred(x, y) = convert(Int64, predict(model, fitresult, [x, y]))
     X = stream.samples[n_avaiable_labels+1:end, :]
     predicted_y = stream.labels[n_avaiable_labels+1:end]
