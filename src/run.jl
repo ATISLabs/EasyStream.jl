@@ -5,15 +5,15 @@ end
 
 function runMD(stream::Stream, model)
 
-    MLJBase.machine(model, stream.samples, stream.labels)
-    MLJBase.fit!(model, rows=1:stream.n_avaiable_labels)
-    return MLJBase.predict(model, row=stream.n_avaiable_labels+1:length(stream.labels)-stream.n_avaiable_labels)
+    machine = MLJBase.machine(model, stream.samples, stream.labels)
+    MLJBase.fit!(machine, rows=1:stream.n_avaiable_labels)
+    return MLJBase.predict(machine, row=stream.n_avaiable_labels+1:length(stream.labels)-stream.n_avaiable_labels)
 end
 
 function runMP(stream::Stream, model)
-    MLJBase.machine(model, stream.samples, stream.labels)
-    MLJBase.fit!(model, rows=1:stream.n_avaiable_labels)
-    return MLJBase.predict_mode(model, row=stream.n_avaiable_labels+1:length(stream.labels)-stream.n_avaiable_labels)
+    machine = MLJBase.machine(model, stream.samples, stream.labels)
+    MLJBase.fit!(machine, rows=1:stream.n_avaiable_labels)
+    return MLJBase.predict_mode(machine, row=stream.n_avaiable_labels+1:length(stream.labels)-stream.n_avaiable_labels)
 end
 
 #=
