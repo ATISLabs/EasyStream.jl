@@ -2,6 +2,7 @@
 #added to data streams context, such function, updatePredict, which execute
 #the prediction and the update routine of the model using the instance(s) predicted.
 
+abstract type StreamDeterministic <: MLJBase.Deterministic end
 
 # fit(model, verb::Integer, training_args...) -> fitresult, cache, report`
 function fit end

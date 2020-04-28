@@ -1,6 +1,6 @@
-using EasyStream
 using Test
-
-@testset "EasyStream.jl" begin
+using EasyStream
+@testset "EasyStream" begin
     # Write your own tests here.
+    EasyStream
 end

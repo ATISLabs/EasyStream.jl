@@ -1,5 +1,3 @@
-module EasyStream
-include("/home/coiote/Codes/jl/DMClassification/src/DMClassification.jl");
 using MLJBase, Plots, StatsPlots, DataFrames
 import MLJModels: fit, predict, predict_mode
 import MLJ: @load, autotype
