@@ -1,7 +1,7 @@
 function runS(stream::Stream, model)
     println("Stream")
     fit_result, _, _ = fit(model, 0, stream.samples[1:stream.n_avaiable_labels, :], stream.labels[1:stream.n_avaiable_labels, :])
-    return update_predict(model, fit_result, stream.samples[stream.n_avaiable_labels+1:end, :], stream.labels[stream.n_avaiable_labels+1:end, :])
+    return updatePredict(model, fit_result, stream.samples[stream.n_avaiable_labels+1:end, :], stream.labels[stream.n_avaiable_labels+1:end, :])
 end
 
 function runM(stream::Stream, model)
