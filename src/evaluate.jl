@@ -55,8 +55,11 @@ function evaluate(streams, models; measures = accuracy, output = :table, header 
         ###Classification
         for (k, model) in enumerate(models)
             #amount = 1 + stream.n_avaiable_labels
-
-            append!(predicted_ys[k], run(stream, model))
+            if model isa Deterministic
+                append!(predicted_ys[k], runS(stream, model))
+            elseif model isa MLJBase.Deterministic
+                append!(predicted_ys[k], runM(stream, model))
+            end
             #=
             ###Model initialization
             fitresult, _, _ = MLJModels.fit(model, 0, stream.samples[1:stream.n_avaiable_labels, :], stream.labels[1:stream.n_avaiable_labels, :])

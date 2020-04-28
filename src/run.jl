@@ -1,10 +1,10 @@
-function run(stream::Stream, model::T) where {T <: Deterministic}
+function runS(stream::Stream, model)
     println("Stream")
     fit_result, _, _ = fit(classifier, 0, stream.samples[1:stream.n_avaiable_labels, :], stream.labels[1:stream.n_avaiable_labels, :])
-    return update_predict(model, fit_result stream.samples[stream.n_avaiable_labels+1:end, :], stream.labels[stream.n_avaiable_labels+1:end, :])
+    return update_predict(model, fit_result, stream.samples[stream.n_avaiable_labels+1:end, :], stream.labels[stream.n_avaiable_labels+1:end, :])
 end
 
-function run(stream::Stream, model::T) where {T <: MLJBase.Deterministic}
+function runM(stream::Stream, model)
     println("MLJBase")
     MLJBase.machine(model, stream.samples, stream.labels)
     MLJBase.fit!(model, rows=1:stream.n_avaiable_labels)
