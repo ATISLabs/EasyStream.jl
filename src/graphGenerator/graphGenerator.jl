@@ -44,11 +44,11 @@ function distributionByClass(stream, model; steps = 1, colors = [:pink, :lightbl
     next_amount = 0
     for j in 1:steps
         next_amount = (amount - 1) + prequential_interval[j]
-        X = stream.samples[amount:next_amount, :]
+        X = stream.samples
 
         predicted_y = MLJModels.predict(model, fitresult, stream.samples[amount:next_amount,:])
         push!(graphs, heatmap(xg, yg, pred, c = cgrad(colors)))
-        scatter!(X[amount:next_amount, 1], X[amount:next_amount, 2], c = Array{Int64}(predicted_y), palette = colors, leg = false)
+        scatter!(X[amount:next_amount, 1], X[amount:next_amount, 2], c = Array{Int64}(stream.labels[amount:next_amount]), palette = colors, leg = false)
         amount = next_amount + 1
     end
     anim = @animate for i in 1:length(graphs)
