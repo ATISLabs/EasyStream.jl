@@ -7,10 +7,8 @@ abstract type Deterministic <: MLJBase.Deterministic end
 # fit(model, verb::Integer, training_args...) -> fitresult, cache, report`
 function fit end
 
-
 # predict(model, fitresult, instance) -> label_predicted`
 function predict end
-
 
 # predict(model, fitresult, instance) -> label_predicted`
 function updatePredict end
