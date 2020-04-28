@@ -31,9 +31,3 @@ function run(stream::Stream, classifier)
     #teste = coerce(predicted_y, Multiclass{})
     return CategoricalArray{}(predicted_y)
 end
-
-function run_test(stream::Stream, classifier)
-    fitresult, _, _ = fit(classifier, 1, stream.samples[1:150, :], stream.labels[1:150, :])
-    return predict_mode(classifier, fitresult, stream.samples[151:500,:])
-
-end

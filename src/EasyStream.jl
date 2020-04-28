@@ -1,6 +1,5 @@
 module EasyStream
-    using MLJBase, Plots, StatsPlots, DataFrames
-    import MLJModels: fit, predict, predict_mode
+    using MLJBase, MLJModels, Plots, StatsPlots, DataFrames
     import MLJ: @load, autotype
     #import DataFrames: DataFrame, CategoricalArray, names!
     export @load, DataFrame, categorical, accuracy, coerce!, autotype
