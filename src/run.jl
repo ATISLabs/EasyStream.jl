@@ -7,13 +7,13 @@ function runMD(stream::Stream, model)
 
     machine = MLJBase.machine(model, stream.samples, stream.labels)
     MLJBase.fit!(machine, rows=1:stream.n_avaiable_labels)
-    return MLJBase.predict(machine, row=stream.n_avaiable_labels+1:length(stream.labels)-stream.n_avaiable_labels)
+    return MLJBase.predict(machine, rows=stream.n_avaiable_labels+1:length(stream.labels))
 end
 
 function runMP(stream::Stream, model)
     machine = MLJBase.machine(model, stream.samples, stream.labels)
     MLJBase.fit!(machine, rows=1:stream.n_avaiable_labels)
-    return MLJBase.predict_mode(machine, row=stream.n_avaiable_labels+1:length(stream.labels)-stream.n_avaiable_labels)
+    return MLJBase.predict_mode(machine, rows=stream.n_avaiable_labels+1:length(stream.labels))
 end
 
 #=
