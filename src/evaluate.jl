@@ -1,9 +1,25 @@
-function evaluate(streams, models; measures = accuracy, output = :table, header = nothing, steps::Int64 = 10)
+"""
+    evaluate(streams, models; measures = [:time])
+    evaluate(streams, models, steps::Int64; measures = [:time])
+
+The function `evaluate` performs the calculus of all measures that were passed as parameter for it and return a struct storing these information.
+
+**Arguments**
+* `streams` is the variable that stores the data streams
+* `models` is the variable that stores the models
+* `measures` is the variable that stores the measures
+* `steps` detemines wether the evaluate process will be diveded over parts
+
+The streams, models and measures can be a only element or a vector of your respects elements.
+"""
+function evaluate(streams, models; measures = [:time], steps = 1)
+    measureset = MeasureSet()
 
     n_models = 1
     n_streams = 1
     n_measures = 1
 
+    ## Transforming single inputs into interative elements
     if models isa Array
         n_models = length(models)
     else
@@ -22,121 +38,144 @@ function evaluate(streams, models; measures = accuracy, output = :table, header 
         measures = [measures]
     end
 
-    if output isa Array
-    else
-        output = [output]
-    end
+    ### Defining names of models and streams
+    model_names = [string(typeof(m)) for m in models]
+    model_names = [split(na, ".")[end] for na in model_names]
 
+    for i in 1:length(model_names)
+        k = 2
+        for j in 1:length(model_names)
+            if i == j
+                continue
+            end
+            if model_names[i] == model_names[j]
+                model_names[j] = model_names[j]*string(k)
+                k += 1
+            end
 
-    ###r_output structure
-    r_output = (tables=[DataFrame() for measure in measures], graphs=Array{Any, 1}(),  bars=Array{Any, 1}())
-
-    ###model names
-    if header == nothing
-        model_names = [string(typeof(m)) for m in models]
-        model_names = [split(na, ".")[end] for na in model_names]
-    elseif length(header) == n_models
-        model_names = header
-    else
-        error("length(header) is different than length(models) ")
+        end
     end
 
     stream_names = [streams[i].name != nothing ? streams[i].name : "ST$i" for i in 1:n_streams]
 
+    ### Assigning the variables to the measureset
+    used_measures = Set()
+    for measure in measures
+        push!(used_measures, measure)
+    end
+    for measure in performance_measures
+        push!(used_measures, measure)
+    end
 
-    for (i, stream) in enumerate(streams)
+    measureset.measures = used_measures
+    measureset.streams = streams
+    measureset.models = models
+    measureset.steps = steps
 
-        ### Creating the interval to do the analisys using the number of steps
+    measureset.names = Dict(
+        :model => model_names,
+        :stream => stream_names)
+
+    measureset.sizes = Dict(
+    :model => n_models,
+    :stream => n_streams)
+
+    if steps == 1
+        measure_calculate(measureset, measureset.measures)
+    elseif steps > 1
+        measure_calculate(measureset, measureset.measures, steps)
+    end
+
+    return measureset
+end
+
+function measure_calculate(measureset, measures)
+    measures = copy(measures)
+
+    if measures isa Set
+        for measure in performance_measures
+            delete!(measures, measure)
+        end
+        measures = collect(measures)
+    end
+
+    if measureset.predicted_ys == nothing
+        measureset.calculated_measures = [[] for i in 1:measureset.sizes[:stream]]
+        measureset.predicted_ys = [[] for i in 1:measureset.sizes[:stream]]
+        performance_info = nothing
+        for (i, stream) in enumerate(measureset.streams)
+            ### Classification
+            for model in measureset.models
+                #amount = 1 + stream.n_avaiable_labels
+                if model isa Deterministic
+                    performance_info = @timed push!(measureset.predicted_ys[i], runS(stream, model))
+                elseif model isa MLJBase.Deterministic
+                    performance_info = @timed push!(measureset.predicted_ys[i], runMD(stream, model))
+                elseif model isa MLJBase.Probabilistic
+                    performance_info = @timed push!(measureset.predicted_ys[i], runMP(stream, model))
+                end
+
+                calculated_measure = Dict(
+                    :time => performance_info[2],
+                    :allocation => performance_info[3]
+                )
+
+                push!(measureset.calculated_measures[i], calculated_measure)
+            end
+        end
+    end
+    ### Calculating measures that will be used
+    for measure in measures
+        for (i, stream) in enumerate(measureset.streams)
+            for j = 1:measureset.sizes[:model]
+                measureset.calculated_measures[i][j][measure] = fmeasures[measure](measureset.predicted_ys[i][j], stream.labels[stream.n_avaiable_labels + 1:end])
+            end
+        end
+    end
+
+end
+
+function measure_calculate(measureset, measures, steps)
+    measures = copy(measures)
+
+    for measure in performance_measures
+        delete!(used_measures, measure)
+    end
+
+    ### Creating variables to save the measures
+    measureset.calculated_measures = [[] for i in 1:measureset.sizes[:stream]]
+    measureset.predicted_ys = [[] for i in 1:measureset.sizes[:stream]]
+    performance_info = nothing
+    for (i, stream) in enumerate(measureset.streams)
+        ### Creating the interval based on number of steps to make the analisys in batchs of classifications
         prequential_interval = interval(length(stream.labels) - stream.n_avaiable_labels, steps)
-        ###
+        ### Classification
+        for (k, model) in enumerate(measureset.models)
+            _start = stream.n_avaiable_labels
+            push!(measureset.predicted_ys[i], [])
+            push!(measureset.calculated_measures[i], [])
 
-        predicted_ys = [Array{Any, 1}() for i in 1:n_models]
-
-        ###Classification
-        for (k, model) in enumerate(models)
-            #amount = 1 + stream.n_avaiable_labels
-            if model isa Deterministic
-                append!(predicted_ys[k], runS(stream, model))
-            elseif model isa MLJBase.Deterministic
-                append!(predicted_ys[k], runMD(stream, model))
-            elseif model isa MLJBase.Probabilistic
-                append!(predicted_ys[k], runMP(stream, model))
-            end
-            #=
-            ###Model initialization
-            fitresult, _, _ = MLJModels.fit(model, 0, stream.samples[1:stream.n_avaiable_labels, :], stream.labels[1:stream.n_avaiable_labels, :])
-
-
-            ###Creating the needed data to distributionByClass function
-
-            if :prequetialDis in output
-                pred(x, y) = convert(Int64, DMClassification.onlyfit(model, fitresult, [x, y]))
-                xg = range(minimum(stream.samples[:,1]), maximum(stream.samples[:,1]), length=50)
-                yg = range(minimum(stream.samples[:,2]), maximum(stream.samples[:,2]), length=50)
-            end
-
-            ###Classifying the samples and gerating graphs using distributionByClass if it was set as a output
-            for j in 1:steps
-                next_amount = (amount - 1) + prequential_interval[j]
-                X = stream.samples[amount:next_amount, :]
-
-                predicted_y = MLJModels.predict(model, fitresult, stream.samples[amount:next_amount,:])
-                #=
-                if :prequetialDis in output
-                    push!(r_output.graphs, distributionByClass(xg, yg, X, pred, predicted_y))
+            for j in 1:length(prequential_interval)
+                _end = _start + prequential_interval[j]
+                _start += 1
+                if model isa Deterministic
+                    performance_info = @timed push!(measureset.predicted_ys[i][k], runS(stream, model, [_start, _end]))
+                elseif model isa MLJBase.Deterministic
+                    performance_info = @timed push!(measureset.predicted_ys[i][k], runMD(stream, model, [_start, _end]))
+                elseif model isa MLJBase.Probabilistic
+                    performance_info = @timed push!(measureset.predicted_ys[i][k], runMP(stream, model, [_start, _end]))
                 end
-                =#
-                append!(predicted_ys[k], predicted_y)
-                amount = next_amount + 1
-            end
-            =#
-
-        end
-
-        ###Meansures
-
-        ###Tables
-        if :table in output
-            for (k, measure) in enumerate(measures)
-                vmeansure = [stream_names[i]; [measure(CategoricalArray{Int64}(predicted_ys[j]) , stream.labels[stream.n_avaiable_labels+1:end]) for j in 1:n_models]]
-                append!(r_output.tables[k], DataFrame(permutedims(vmeansure)))
-            end
-        end
-
-        if :prequential in output
-            points_vector = [Array{Any, 1}() for i in 1:n_models]
-            for (j, model) in enumerate(models)
-                amount = 1
-                next_amount = 0
-                for k in 1:steps
-                    next_amount = (amount - 1) + prequential_interval[k]
-                    push!(points_vector[j], accuracy(CategoricalArray{Int64}(predicted_ys[j][amount:next_amount]), stream.labels[amount+150:next_amount+150]))
-                    amount = next_amount + 1
+                calculated_measure = Dict(
+                    :time => performance_info[2],
+                    :allocation => performance_info[3]
+                )
+                push!(measureset.calculated_measures[i][k], calculated_measure)
+                ### Calculating measures other measures
+                for measure in measures
+                    measureset.calculated_measures[i][k][j][measure] = fmeasures[measure](measureset.predicted_ys[i][k][j], stream.labels[_start:_end])
                 end
+                _start = _end
             end
-            graph_plot = plot(points_vector, labels=permutedims(model_names), legend=:outertopright)
-            push!(r_output.graphs, graph_plot)
-        end
-    end# END FOR STREAM
-
-
-
-    if :bar in output
-        for (k, measure) in enumerate(measures)
-            ctg = repeat(model_names, inner = n_streams)
-            nam = repeat(stream_names, outer = n_models)
-            push!(r_output.bars, groupedbar(nam, convert(Array{Float64}, r_output.tables[k][:,2:end]),
-                group = ctg, xlabel = "Streams", ylabel = "Measure",
-                bar_width = 0.67, lw = 0, framestyle = :box, legend=:outerbottom))
-         end
-    end
-
-
-    ###Set tables column names
-    if :table in output
-        for table in r_output.tables
-             names!(table, [Symbol("Stream_Names"); [Symbol(name) for name in model_names]])
         end
     end
-    return r_output
 end
