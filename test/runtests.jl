@@ -26,7 +26,6 @@ using Test
     @test size(EasyStream.next!(buffer), 1) == initial_size - 1
     @test EasyStream.next!(buffer) == nothing
 
-
     @test_logs (:warn, "initial size é zero") EasyStream.Dataset1CDT(0, 1)
     @test_logs (:warn, "flux size é zero") EasyStream.Dataset1CDT(1, 0)
 end

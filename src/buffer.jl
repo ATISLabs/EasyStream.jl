@@ -10,9 +10,10 @@ mutable struct MemoryBuffer <: Buffer
 end
 
 function MemoryBuffer(path::String, initial_size::Int, flux_size::Int)
+    #TODO: Buffer está sabendo a memoria e se fosse api?
     data = CSV.read(path; header = false)
 
-    if(initial_size > size(data, 1))
+    if initial_size > size(data, 1)
         initial_size = size(data, 1)
         @warn "initial size é maior que o arquivo e será definido para o tamanho do arquivo"
     end
@@ -34,11 +35,11 @@ Dataset1CDT(initial_size::Int, flux_size::Int) = MemoryBuffer("datasets/1CDT.csv
 next!(buffer::Buffer) = nothing
 
 function next!(buffer::MemoryBuffer)
-    if(buffer.position >= size(buffer.data, 1))
+    if buffer.position >= size(buffer.data, 1)
         return nothing
     end
 
-    if(buffer.position < buffer.initial_size)
+    if buffer.position < buffer.initial_size
         buffer.position = buffer.initial_size
         return buffer.data[1:buffer.initial_size, :]
     else

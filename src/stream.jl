@@ -10,6 +10,7 @@ function Stream(buffer::Buffer)
     return Stream(buffer, data)
 end
 
+#TODO: Casos limites?
 Base.getindex(stream::Stream, sample::Int64) = stream.data[length(stream.data)][sample, :]
 
 function next!(stream::Stream)
