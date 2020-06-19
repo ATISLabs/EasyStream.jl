@@ -1,4 +1,6 @@
 module EasyStream
-    include("src/buffer.jl")
-    include("src/stream.jl")
+    using DataFrames
+
+    include("buffer.jl")
+    include("stream.jl")
 end # module
