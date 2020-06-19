@@ -1,7 +1,4 @@
-using Revise
 module EasyStream
-    using CSVFiles, DataFrames
-
-    include("./datatypes/StreamFeeder.jl")
-    include("./datatypes/Stream.jl")
+    include("src/buffer.jl")
+    include("src/stream.jl")
 end # module

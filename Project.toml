@@ -4,6 +4,7 @@ authors = ["Pedro Conrado"]
 version = "0.1.0"
 
 [deps]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 CSVFiles = "5d742f6a-9f54-50ce-8119-2520741973ca"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 MLJ = "add582a8-e3ab-11e8-2d5e-e98b27df1bc7"
@@ -11,7 +12,7 @@ RDatasets = "ce6b1742-4840-55fa-b093-852dadbb1d8b"
 Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 
 [compat]
-julia = "0.1"
+julia = "1.0"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
