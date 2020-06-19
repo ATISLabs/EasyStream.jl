@@ -1,5 +1,3 @@
-using CSV
-
 abstract type Buffer end
 
 mutable struct MemoryBuffer <: Buffer
@@ -9,10 +7,7 @@ mutable struct MemoryBuffer <: Buffer
     flux_size::Int
 end
 
-function MemoryBuffer(path::String, initial_size::Int, flux_size::Int)
-    #TODO: Buffer está sabendo a memoria e se fosse api?
-    data = CSV.read(path; header = false)
-
+function MemoryBuffer(data::DataFrame, initial_size::Int, flux_size::Int)
     if initial_size > size(data, 1)
         initial_size = size(data, 1)
         @warn "initial size é maior que o arquivo e será definido para o tamanho do arquivo"
@@ -28,9 +23,6 @@ function MemoryBuffer(path::String, initial_size::Int, flux_size::Int)
 
     return MemoryBuffer(data, 0, initial_size, flux_size)
 end
-
-Dataset1CDT() = Dataset1CDT(150, 1)
-Dataset1CDT(initial_size::Int, flux_size::Int) = MemoryBuffer("datasets/1CDT.csv", initial_size, flux_size)
 
 next!(buffer::Buffer) = nothing
 
