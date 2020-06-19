@@ -3,4 +3,5 @@ module EasyStream
 
     include("buffer.jl")
     include("stream.jl")
+    include("datasets.jl")
 end # module
