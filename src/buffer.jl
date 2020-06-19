@@ -33,10 +33,11 @@ function next!(buffer::MemoryBuffer)
 
     if buffer.position < buffer.initial_size
         buffer.position = buffer.initial_size
-        return buffer.data[1:buffer.initial_size, :]
+        index = 1:buffer.initial_size
     else
         index = (buffer.position + 1):(buffer.position + buffer.flux_size)
         buffer.position = buffer.position + buffer.flux_size
-        return buffer.data[index, :]
     end
+
+    return buffer.data[index, :]
 end
