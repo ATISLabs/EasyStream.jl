@@ -9,7 +9,24 @@ mutable struct MemoryBuffer <: Buffer
     flux_size::Int
 end
 
-MemoryBuffer(path::String, initial_size::Int, flux_size::Int) = MemoryBuffer(CSV.read(path), 0, initial_size, flux_size)
+function MemoryBuffer(path::String, initial_size::Int, flux_size::Int)
+    data = CSV.read(path; header = false)
+
+    if(initial_size > size(data, 1))
+        initial_size = size(data, 1)
+        @warn "initial size é maior que o arquivo e será definido para o tamanho do arquivo"
+    end
+
+    if initial_size == 0
+        @warn "initial size é zero"
+    end
+
+    if flux_size == 0
+        @warn "flux size é zero"
+    end
+
+    return MemoryBuffer(data, 0, initial_size, flux_size)
+end
 
 Dataset1CDT() = Dataset1CDT(150, 1)
 Dataset1CDT(initial_size::Int, flux_size::Int) = MemoryBuffer("datasets/1CDT.csv", initial_size, flux_size)
