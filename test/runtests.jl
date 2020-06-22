@@ -7,7 +7,7 @@ using EasyStream
     @test EasyStream.DataStreams.check(test_file) == 0 
     @test EasyStream.DataStreams.download("https://github.com/Conradox/datastreams/blob/master/sinthetic/moduletest.csv", "moduletest.csv") == 1
     @test EasyStream.DataStreams.check(test_file) == 1
-    rm(EasyStream.DataStreams.DataStreams.local_path * '/' * test_file)
+    rm(EasyStream.DataStreams.local_path * '/' * test_file)
 end
 
 
