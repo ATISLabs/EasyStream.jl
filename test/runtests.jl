@@ -1,5 +1,15 @@
-using EasyStream
 using Test
+using EasyStream
+
+
+@testset "Module DataStreams" begin
+    test_file = "moduletest.csv"
+    @test EasyStream.DataStreams.check(test_file) == 0 
+    @test EasyStream.DataStreams.download("https://github.com/Conradox/datastreams/blob/master/sinthetic/moduletest.csv", "moduletest.csv") == 1
+    @test EasyStream.DataStreams.check(test_file) == 1
+    rm(EasyStream.DataStreams.DataStreams.local_path * '/' * test_file)
+end
+
 
 @testset "Stream Test" begin
     stream = EasyStream.Dataset1CDT()
