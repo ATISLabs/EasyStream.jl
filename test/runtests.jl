@@ -29,3 +29,27 @@ using Test
     @test_logs (:warn, "initial size é zero") EasyStream.Dataset1CDT(0, 1)
     @test_logs (:warn, "flux size é zero") EasyStream.Dataset1CDT(1, 0)
 end
+
+@testset "Stream Indexing" begin
+    @testset "First Dimension" begin
+        buffer = EasyStream.Dataset1CDT()
+        stream = EasyStream.Dataset1CDT()
+        stream = EasyStream.Stream(stream)
+
+        test_data = stream.data[1]
+        data_size = size(test_data, 1)
+        for i=1:data_size
+            @test stream[i] == test_data[i,:]
+        end
+
+        @test_throws BoundsError stream[-1]
+
+        @test_throws BoundsError stream[data_size + 1]
+
+        @test stream[:] == test_data[:, :]
+        
+        for i=1:data_size
+            @test stream[1:i] == test_data[1:i,:]
+        end
+    end
+end
