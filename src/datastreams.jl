@@ -3,16 +3,16 @@ module DataStreams
 
     export Dataset1CDT, DatasetUG_2C_5D
 
-    tmp_path = tempdir()
-    directory_name = "EasyDataStream"
-    local_path = tmp_path * '/' * directory_name
-    
-    mk_tmp_dir() = mkdir(directory_name)
+    const TMP_DIR = tempdir()
+    const DIR_NAME = "EasyDataStream"
+    const DATASTREANS_DIR = joinpath(TMP_DIR, DIR_NAME)
+
+    mk_tmp_dir() = mkdir(DIR_NAME)
 
     function check(name)
-        tmp_directories = readdir(tmp_path)
-        if directory_name in tmp_directories
-            downloaded_datastreams = readdir(local_path)
+        tmp_directories = readdir(TMP_DIR)
+        if DIR_NAME in tmp_directories
+            downloaded_datastreams = readdir(DATASTREANS_DIR)
             
             if(name in downloaded_datastreams)
                 return 1
@@ -20,7 +20,7 @@ module DataStreams
                 return 0
             end
         else
-            cd(mk_tmp_dir, tmp_path)
+            cd(mk_tmp_dir, TMP_DIR)
             return 0 
         end
     end
@@ -39,15 +39,15 @@ module DataStreams
         return 1
     end
 
-    download(url, name) = download(url, name, local_path)
+    download(url, name) = download(url, name, DATASTREANS_DIR)
 
     #TODO: O retorno dessa função não pode ser o dataStream já na memoria, pois haverá buffers que irão querer somente o path
     function get_datastream(url, name)
         if check(name) == 1
-            return CSV.read(local_path * '/' * name; header = false)
+            return CSV.read(DATASTREANS_DIR * '/' * name; header = false)
         else
             download(url, name)
-            return CSV.read(local_path * '/' * name; header = false)
+            return CSV.read(DATASTREANS_DIR * '/' * name; header = false)
         end
     end
 
