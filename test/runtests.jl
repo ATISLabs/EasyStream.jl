@@ -31,7 +31,7 @@ using Test
 end
 
 @testset "Stream Indexing" begin
-    @testset "First Dimension" begin
+    @testset "Test using one index" begin
         buffer = EasyStream.Dataset1CDT()
         stream = EasyStream.Dataset1CDT()
         stream = EasyStream.Stream(stream)
@@ -51,5 +51,37 @@ end
         for i=1:data_size
             @test stream[1:i] == test_data[1:i,:]
         end
+    end
+
+    @testset "Test using two index " begin
+        buffer = EasyStream.Dataset1CDT()
+        stream = EasyStream.Dataset1CDT()
+        stream = EasyStream.Stream(stream)
+
+        
+        @test stream[1, :]== stream[1]
+        
+        for i=1:length(stream[1])
+            @test stream[1, i] == stream[1][i]
+        end
+
+        for i=1:length(stream[1])
+            @test stream[:, i] == stream[:][:, i]
+        end
+
+        @test stream[:] == stream[:, :]
+
+        #TODO Criação de testes unitários para o acesso ao stream usando range
+        
+        N_INSTANCES = size(stream[:], 1)
+        N_FEATURES = length(stream[1])
+
+        @test_throws BoundsError stream[1, N_FEATURES + 1]
+        @test_throws BoundsError stream[:, N_FEATURES + 1]
+        @test_throws BoundsError stream[N_INSTANCES + 1, :]
+        
+        @test_throws BoundsError stream[1, -1]
+        @test_throws BoundsError stream[:, -1]
+        @test_throws BoundsError stream[-1, :]
     end
 end
