@@ -1,9 +1,10 @@
 module EasyStream
     using DataFrames
 
-    include("buffer.jl")
+    include("stream.jl")
+    include("pool.jl")
     include("datasets.jl")
-    include("datastream.jl")
+
 
     using .DatasetsStreams
 end # module

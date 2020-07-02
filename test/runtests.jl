@@ -2,47 +2,47 @@ using Test
 using EasyStream
 
 @testset "Dataset Test" begin
-    stream = EasyStream.Dataset1CDT()
-    @test size(stream[:], 1) == 150
+    pool = EasyStream.Dataset1CDT()
+    @test size(pool[:], 1) == 150
 
     initial_size = 200
     flux_size = 5
-    stream = EasyStream.Dataset1CDT(initial_size, flux_size)
-    @test size(stream[:], 1) == 200
+    pool = EasyStream.Dataset1CDT(initial_size, flux_size)
+    @test size(pool[:], 1) == 200
 
-    stream = EasyStream.DatasetUG_2C_5D()
-    @test size(stream[:], 1) == 150
+    pool = EasyStream.DatasetUG_2C_5D()
+    @test size(pool[:], 1) == 150
 
     initial_size = 200
     flux_size = 5
-    stream = EasyStream.DatasetUG_2C_5D(initial_size, flux_size)
-    @test size(stream[:], 1) == 200
+    pool = EasyStream.DatasetUG_2C_5D(initial_size, flux_size)
+    @test size(pool[:], 1) == 200
 end
 
 @testset "Stream Test" begin
-    stream = EasyStream.Dataset1CDT()
-    @test size(EasyStream.next!stream), 1) == 150
-    @test size(EasyStream.next!(stream), 1) == 1
-    @test size(EasyStream.next!(stream), 1) == 1
+    pool = EasyStream.Dataset1CDT()
+    @test size(EasyStream.next!pool), 1) == 150
+    @test size(EasyStream.next!(pool), 1) == 1
+    @test size(EasyStream.next!(pool), 1) == 1
 
     initial_size = 200
     flux_size = 5
-    stream = EasyStream.Dataset1CDT(initial_size, flux_size)
-    @test size(EasyStream.next!(stream), 1) == initial_size
-    @test size(EasyStream.next!(stream), 1) == flux_size
-    @test size(EasyStream.next!(stream), 1) == flux_size
+    pool = EasyStream.Dataset1CDT(initial_size, flux_size)
+    @test size(EasyStream.next!(pool), 1) == initial_size
+    @test size(EasyStream.next!(pool), 1) == flux_size
+    @test size(EasyStream.next!(pool), 1) == flux_size
 
     initial_size = 16000
     flux_size = 1
-    stream = EasyStream.Dataset1CDT(initial_size, flux_size)
-    @test size(EasyStream.next!(stream), 1) == initial_size
-    @test EasyStream.next!(stream) == nothing
+    pool = EasyStream.Dataset1CDT(initial_size, flux_size)
+    @test size(EasyStream.next!(pool), 1) == initial_size
+    @test EasyStream.next!(pool) == nothing
 
     initial_size = 16001
     flux_size = 1
-    stream = EasyStream.Dataset1CDT(initial_size, flux_size)
-    @test size(EasyStream.next!(stream), 1) == initial_size - 1
-    @test EasyStream.next!(stream) == nothing
+    pool = EasyStream.Dataset1CDT(initial_size, flux_size)
+    @test size(EasyStream.next!(pool), 1) == initial_size - 1
+    @test EasyStream.next!(pool) == nothing
 
     @test_logs (:warn, "initial size é zero") EasyStream.Dataset1CDT(0, 1)
     @test_logs (:warn, "flux size é zero") EasyStream.Dataset1CDT(1, 0)
@@ -50,51 +50,51 @@ end
 
 @testset "Stream Indexing" begin
     @testset "Test using one index" begin
-        stream = EasyStream.Dataset1CDT()
+        pool = EasyStream.Dataset1CDT()
 
-        test_data = stream.data[1]
+        test_data = pool.data[1]
         data_size = size(test_data, 1)
         for i=1:data_size
-            @test stream[i] == test_data[i,:]
+            @test pool[i] == test_data[i,:]
         end
 
-        @test_throws BoundsError stream[-1]
+        @test_throws BoundsError pool[-1]
 
-        @test_throws BoundsError stream[data_size + 1]
+        @test_throws BoundsError pool[data_size + 1]
 
-        @test stream[:] == test_data[:, :]
+        @test pool[:] == test_data[:, :]
 
         for i=1:data_size
-            @test stream[1:i] == test_data[1:i,:]
+            @test pool[1:i] == test_data[1:i,:]
         end
     end
 
     @testset "Test using two index " begin
-        stream = EasyStream.Dataset1CDT()
+        pool = EasyStream.Dataset1CDT()
 
-        @test stream[1, :]== stream[1]
+        @test pool[1, :]== pool[1]
 
-        for i=1:length(stream[1])
-            @test stream[1, i] == stream[1][i]
+        for i=1:length(pool[1])
+            @test pool[1, i] == pool[1][i]
         end
 
-        for i=1:length(stream[1])
-            @test stream[:, i] == stream[:][:, i]
+        for i=1:length(pool[1])
+            @test pool[:, i] == pool[:][:, i]
         end
 
-        @test stream[:] == stream[:, :]
+        @test pool[:] == pool[:, :]
 
-        #TODO Criação de testes unitários para o acesso ao stream usando range
+        #TODO Criação de testes unitários para o acesso ao pool usando range
 
-        N_INSTANCES = size(stream[:], 1)
-        N_FEATURES = length(stream[1])
+        N_INSTANCES = size(pool[:], 1)
+        N_FEATURES = length(pool[1])
 
-        @test_throws BoundsError stream[1, N_FEATURES + 1]
-        @test_throws BoundsError stream[:, N_FEATURES + 1]
-        @test_throws BoundsError stream[N_INSTANCES + 1, :]
+        @test_throws BoundsError pool[1, N_FEATURES + 1]
+        @test_throws BoundsError pool[:, N_FEATURES + 1]
+        @test_throws BoundsError pool[N_INSTANCES + 1, :]
 
-        @test_throws BoundsError stream[1, -1]
-        @test_throws BoundsError stream[:, -1]
-        @test_throws BoundsError stream[-1, :]
+        @test_throws BoundsError pool[1, -1]
+        @test_throws BoundsError pool[:, -1]
+        @test_throws BoundsError pool[-1, :]
     end
 end
