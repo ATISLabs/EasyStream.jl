@@ -1,16 +1,16 @@
-struct Stream
+struct DataStream
     buffer::Buffer
     data::Vector{DataFrame}
 end
 
-function Stream(buffer::Buffer)
+function DataStream(buffer::Buffer)
     data = Vector{DataFrame}()
     push!(data, next!(buffer))
-    return Stream(buffer, data)
+    return DataStream(buffer, data)
 end
 
 #Using one index to explore the data
-function Base.getindex(stream::Stream, instance::Int64)
+function Base.getindex(stream::DataStream, instance::Int64)
     if instance > 0 && instance <= size(stream.data[length(stream.data)], 1)
         return stream.data[length(stream.data)][instance, :]
     else 
@@ -18,11 +18,11 @@ function Base.getindex(stream::Stream, instance::Int64)
     end
 end
 
-function Base.getindex(stream::Stream, c::Colon)
+function Base.getindex(stream::DataStream, c::Colon)
     return stream.data[length(stream.data)][:, :]
 end
 
-function Base.getindex(stream::Stream, index::UnitRange{Int})
+function Base.getindex(stream::DataStream, index::UnitRange{Int})
     sample = DataFrame()
     for i=1:length(index)
         push!(sample, stream[index[i]])
@@ -31,47 +31,47 @@ function Base.getindex(stream::Stream, index::UnitRange{Int})
 end
 
 #Using two index to explore the data
-function Base.getindex(stream::Stream, instance::Int64, feature::Int64)
+function Base.getindex(stream::DataStream, instance::Int64, feature::Int64)
     if feature > 0 && feature <= size(stream[instance], 1)
         return stream[instance][feature]
-    else 
+    else
         throw(BoundsError(stream.data, feature))
     end
 end
 
-function Base.getindex(stream::Stream, c::Colon, feature::Int64)
+function Base.getindex(stream::DataStream, c::Colon, feature::Int64)
     if feature > 0 && feature <= size(stream[:], 2)
         return stream[:][:, feature]
-    else 
+    else
         throw(BoundsError(stream.data, feature))
     end
 end
 
-function Base.getindex(stream::Stream, index::UnitRange{Int}, feature::Int64)
+function Base.getindex(stream::DataStream, index::UnitRange{Int}, feature::Int64)
     if feature > 0 && feature <= size(stream[:], 2)
         return stream[index][:, feature]
-    else 
+    else
         throw(BoundsError(stream.data, feature))
     end
 end
 
-function Base.getindex(stream::Stream, index::UnitRange{Int}, c::Colon)
+function Base.getindex(stream::DataStream, index::UnitRange{Int}, c::Colon)
     return stream[index]
 end
 
-function Base.getindex(stream::Stream, instance::Int64, c::Colon)
+function Base.getindex(stream::DataStream, instance::Int64, c::Colon)
     return stream[instance]
 end
 
-function Base.getindex(stream::Stream, c::Colon, c2::Colon)
+function Base.getindex(stream::DataStream, c::Colon, c2::Colon)
     return stream[:]
 end
 
-function Base.getindex(stream::Stream, instance::Int64, index::UnitRange{Int})
+function Base.getindex(stream::DataStream, instance::Int64, index::UnitRange{Int})
     return [stream[instance, index[i]] for i = 1:length(index)]
 end
 
-function Base.getindex(stream::Stream, c::Colon, index::UnitRange{Int})
+function Base.getindex(stream::DataStream, c::Colon, index::UnitRange{Int})
     sample = DataFrame()
     for i = 1:size(stream[:], 1)
         append!(sample, DataFrame(permutedims(stream[i, index])))
@@ -79,7 +79,7 @@ function Base.getindex(stream::Stream, c::Colon, index::UnitRange{Int})
     return sample
 end
 
-function Base.getindex(stream::Stream, indexI::UnitRange{Int}, indexF::UnitRange{Int})
+function Base.getindex(stream::DataStream, indexI::UnitRange{Int}, indexF::UnitRange{Int})
     sample = DataFrame()
     for i = 1:length(indexI)
         append!(sample, DataFrame(permutedims(stream[indexI[i], indexF])))
@@ -87,6 +87,6 @@ function Base.getindex(stream::Stream, indexI::UnitRange{Int}, indexF::UnitRange
     return sample
 end
 
-function next!(stream::Stream)
+function next!(stream::DataStream)
     push!(stream.data, next!(stream.buffer))
 end

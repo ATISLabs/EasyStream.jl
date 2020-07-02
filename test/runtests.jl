@@ -1,19 +1,27 @@
 using Test
 using EasyStream
 
+@testset "Dataset Test" begin
+    stream = EasyStream.Dataset1CDT()
+    @test size(stream[:], 1) == 150
 
-@testset "Module DataStreams" begin
-    test_file = "moduletest.csv"
-    @test EasyStream.DataStreams.check(test_file) == 0 
-    @test EasyStream.DataStreams.download("https://github.com/Conradox/datastreams/blob/master/sinthetic/moduletest.csv", "moduletest.csv") == 1
-    @test EasyStream.DataStreams.check(test_file) == 1
-    rm(EasyStream.DataStreams.DataStreams.local_path * '/' * test_file)
+    initial_size = 200
+    flux_size = 5
+    stream = EasyStream.Dataset1CDT(initial_size, flux_size)
+    @test size(stream[:], 1) == 200
+
+    stream = EasyStream.DatasetUG_2C_5D()
+    @test size(stream[:], 1) == 150
+
+    initial_size = 200
+    flux_size = 5
+    stream = EasyStream.DatasetUG_2C_5D(initial_size, flux_size)
+    @test size(stream[:], 1) == 200
 end
-
 
 @testset "Stream Test" begin
     stream = EasyStream.Dataset1CDT()
-    @test size(EasyStream.next!(stream), 1) == 150
+    @test size(EasyStream.next!stream), 1) == 150
     @test size(EasyStream.next!(stream), 1) == 1
     @test size(EasyStream.next!(stream), 1) == 1
 
@@ -42,9 +50,7 @@ end
 
 @testset "Stream Indexing" begin
     @testset "Test using one index" begin
-        buffer = EasyStream.Dataset1CDT()
         stream = EasyStream.Dataset1CDT()
-        stream = EasyStream.Stream(stream)
 
         test_data = stream.data[1]
         data_size = size(test_data, 1)
@@ -57,20 +63,17 @@ end
         @test_throws BoundsError stream[data_size + 1]
 
         @test stream[:] == test_data[:, :]
-        
+
         for i=1:data_size
             @test stream[1:i] == test_data[1:i,:]
         end
     end
 
     @testset "Test using two index " begin
-        buffer = EasyStream.Dataset1CDT()
         stream = EasyStream.Dataset1CDT()
-        stream = EasyStream.Stream(stream)
 
-        
         @test stream[1, :]== stream[1]
-        
+
         for i=1:length(stream[1])
             @test stream[1, i] == stream[1][i]
         end
@@ -82,14 +85,14 @@ end
         @test stream[:] == stream[:, :]
 
         #TODO Criação de testes unitários para o acesso ao stream usando range
-        
+
         N_INSTANCES = size(stream[:], 1)
         N_FEATURES = length(stream[1])
 
         @test_throws BoundsError stream[1, N_FEATURES + 1]
         @test_throws BoundsError stream[:, N_FEATURES + 1]
         @test_throws BoundsError stream[N_INSTANCES + 1, :]
-        
+
         @test_throws BoundsError stream[1, -1]
         @test_throws BoundsError stream[:, -1]
         @test_throws BoundsError stream[-1, :]
