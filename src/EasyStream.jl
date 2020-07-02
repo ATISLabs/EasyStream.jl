@@ -5,6 +5,5 @@ module EasyStream
     include("pool.jl")
     include("datasets.jl")
 
-
     using .DatasetsStreams
 end # module

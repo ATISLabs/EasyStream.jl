@@ -1,4 +1,4 @@
-abstract type Stream end
+abstract type Stream{T} end
 
 mutable struct MemoryStream{T} <: Stream{T}
     data::T
@@ -7,7 +7,7 @@ mutable struct MemoryStream{T} <: Stream{T}
     batch::Int
 end
 
-function MemoryStream(data::T, initial_size::Int, batch::Int)
+function MemoryStream(data::T, initial_size::Int, batch::Int) where T
     if initial_size > size(data, 1)
         initial_size = size(data, 1)
         @warn "initial size é maior que o arquivo e será definido para o tamanho do arquivo"
