@@ -61,9 +61,7 @@ end
             @test pool[i] == test_data[i,:]
         end
 
-        #@test_throws BoundsError pool[-1]
-
-        #@test_throws BoundsError pool[data_size + 1]
+        
 
         @test pool[:] == test_data[:, :]
 
@@ -71,7 +69,7 @@ end
             @test pool[1:i] == test_data[1:i,:]
         end
 
-        ##Testing mapper
+        ## Testing mapper
         counter = pool.stream.initial_size
         for i=1:20
             EasyStream.next!(pool)
@@ -80,6 +78,11 @@ end
             end
             @test size(pool[:], 1) == counter
         end
+
+
+        #@test_throws BoundsError pool[-1]
+
+        #@test_throws BoundsError pool[data_size + 1]
     end
 
     @testset "Test using two index " begin
@@ -98,7 +101,7 @@ end
         @test pool[:] == pool[:, :]
 
         #TODO Criação de testes unitários para o acesso ao pool usando range
-#=
+        #=
         N_INSTANCES = size(pool[:], 1)
         N_FEATURES = length(pool[1])
 
@@ -109,7 +112,7 @@ end
         @test_throws BoundsError pool[1, -1]
         @test_throws BoundsError pool[:, -1]
         @test_throws BoundsError pool[-1, :]
-=#
+        =#
     end
 
 end

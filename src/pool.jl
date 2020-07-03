@@ -37,7 +37,7 @@ function useble_length(pool)
     return count
 end
 
-##Indexing - Using one index, moving throght of the instances
+##Indexing - Using one index, moving through of the instances
 function Base.getindex(pool::Pool, index::Int)
     count = 1
     for i=1:size(pool.data, 1)
@@ -77,4 +77,27 @@ function Base.getindex(pool::Pool, range::UnitRange{Int64})
     end
     return data
 end
+
+##Indexing - Using one index, moving through of the instances and features
+
+Base.getindex(pool::Pool, instance::Int, feature::Int) = pool[instance][feature]
+
+Base.getindex(pool::Pool, instance::Int, c::Colon) = pool[instance]
+
+Base.getindex(pool::Pool, instance::Int, range::UnitRange{Int64}) = pool[instance][range] 
+
+Base.getindex(pool::Pool, c::Colon, feature::Int) = pool[:][:, feature]
+
+Base.getindex(pool::Pool, c::Colon, range::UnitRange{Int64}) = pool[:][:, range]
+
+Base.getindex(pool::Pool, c1::Colon, c2::Colon) = pool[:]
+
+Base.getindex(pool::Pool, range::UnitRange{Int64}, feature::Int) = pool[range][:, feature]
+
+Base.getindex(pool::Pool, range::UnitRange{Int64}, c::Colon) = pool[range]
+
+Base.getindex(pool::Pool, range::UnitRange{Int64}, range2::UnitRange{Int64}) = pool[range][:, range2]
+
+##Indexing - Using one index, moving through of the instances, features, samples
+
 
