@@ -18,8 +18,9 @@ end
 function next!(pool::Pool)
     streamdata = next!(pool.stream)
     pool.size += size(streamdata, 1)
-    push!(pool.data, streamdata)
+    
     push!(pool.mapping, rand(Bool, size(streamdata, 1)))
+    push!(pool.data, streamdata)
     return streamdata
 end
 
@@ -37,7 +38,7 @@ function useble_length(pool)
     return count
 end
 
-##Indexing - Using one index, moving through of the instances
+##Indexing - Using three indexes to move in data through the instances
 function Base.getindex(pool::Pool, index::Int)
     count = 1
     for i=1:size(pool.data, 1)
@@ -78,7 +79,7 @@ function Base.getindex(pool::Pool, range::UnitRange{Int64})
     return data
 end
 
-##Indexing - Using one index, moving through of the instances and features
+##Indexing - Using two indexes to move in data through the instances and features
 
 Base.getindex(pool::Pool, instance::Int, feature::Int) = pool[instance][feature]
 
@@ -98,6 +99,6 @@ Base.getindex(pool::Pool, range::UnitRange{Int64}, c::Colon) = pool[range]
 
 Base.getindex(pool::Pool, range::UnitRange{Int64}, range2::UnitRange{Int64}) = pool[range][:, range2]
 
-##Indexing - Using one index, moving through of the instances, features, samples
+##Indexing - Using three indexes to move in data through the instances, features, samples
 
 
