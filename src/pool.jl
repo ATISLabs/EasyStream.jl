@@ -39,12 +39,12 @@ function useble_length(pool)
 end
 
 ##Indexing - Using three indexes to move in data through the instances
-function Base.getindex(pool::Pool, index::Int)
+function Base.getindex(pool::Pool, instance::Int)
     count = 1
     for i=1:size(pool.data, 1)
         for j=1:size(pool.data[i], 1)
             if pool.mapping[i][j]
-                if count == index
+                if count == instance
                     return pool.data[i][j, :]
                 end
                 count += 1 
@@ -101,4 +101,40 @@ Base.getindex(pool::Pool, range::UnitRange{Int64}, range2::UnitRange{Int64}) = p
 
 ##Indexing - Using three indexes to move in data through the instances, features, samples
 
+#=
+if sample > size(pool.data, 1)
+        throw(BoundsError(pool.data, sample))
+    else if instance > size(pool.data[sample], 1)
+        throw(BoundsError(pool.data[sample], instance))
+    else if feature > size(pool.data[sample], 2)
+        throw(BoundsError(pool.data[sample][instance], feature))
+    end
+=#
+function Base.getindex(pool::Pool, instance::Int, feature::Colon, sample::Int)
+    count = 1
+    for j=1:size(pool.data[sample], 1)
+        if pool.mapping[sample][j]
+            if count == instance
+                return pool.data[sample][j, :]
+            end
+            count += 1
+        end
+    end
+end
 
+#Base.getindex(pool::Pool, instance::Int, feature::Int, sample::Int) = pool[instance, :, sample][feature]
+
+
+function Base.getindex(pool::Pool, instance::Int, feature::Int, sample::Int)    
+    count = 1
+    for j=1:size(pool.data[sample], 1)
+        if pool.mapping[sample][j]
+            if count == instance
+                return pool.data[sample][j, feature]
+            end
+            count += 1
+        end
+    end
+end
+
+#Base.getindex(pool::Pool, instance::Int, feature::Int, sample::Int) = pool[instance, :, sample]

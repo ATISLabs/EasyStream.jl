@@ -17,7 +17,7 @@ module DatasetsStreams
         mv(path, joinpath(defdir, "synthetic/UG_2C_5D.csv"))
     end
 
-    function Dataset1CDT(initial_size::Int, flux_size::Int)::EasyStream.Pool
+    function Dataset1CDT(initial_size::Int, flux_size::Int)::EasyStream.MemoryStream
         filename = "$(defdir)/synthetic/1CDT.csv"
 
         isfile(filename) || get1cdtdata(defdir)
@@ -26,12 +26,12 @@ module DatasetsStreams
 
         stream = EasyStream.MemoryStream(data, initial_size, flux_size)
 
-        return EasyStream.Pool(stream)
+        return stream
     end
 
     Dataset1CDT() = Dataset1CDT(150, 1)
 
-    function DatasetUG_2C_5D(initial_size::Int, flux_size::Int)::EasyStream.Pool
+    function DatasetUG_2C_5D(initial_size::Int, flux_size::Int)::EasyStream.MemoryStream
         filename = "$(defdir)/synthetic/UG_2C_5D.csv"
 
         isfile(filename) || getug2c5ddata(defdir)
@@ -40,7 +40,7 @@ module DatasetsStreams
 
         stream = EasyStream.MemoryStream(data, initial_size, flux_size)
 
-        return EasyStream.Pool(stream)
+        return stream
     end
 
     DatasetUG_2C_5D() = DatasetUG_2C_5D(150, 1)
