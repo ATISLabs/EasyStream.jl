@@ -1,8 +1,9 @@
-mutable struct Pool{T <: Stream}
+mutable struct Pool{T <: Stream, N}
     stream::T
-    data::Vector{DataFrame}
+    data::Vector{N}
     mapping::Vector{Vector{Bool}}
     size::Int64
+    N
 end
 
 function Pool(stream::Stream)
@@ -12,14 +13,15 @@ function Pool(stream::Stream)
     mapping = Vector{Vector{Bool}}()
     push!(mapping, ones(Bool, size(streamdata, 1)))
     
-    return Pool(stream, data, mapping, size(streamdata, 1))
+    return Pool(stream, data, mapping, size(streamdata, 1), DataFrame)
 end
 
 function next!(pool::Pool)
     streamdata = next!(pool.stream)
     pool.size += size(streamdata, 1)
     
-    push!(pool.mapping, rand(Bool, size(streamdata, 1)))
+    #push!(pool.mapping, rand(Bool, size(streamdata, 1)))
+    push!(pool.mapping, ones(Bool, size(streamdata, 1)))
     push!(pool.data, streamdata)
     return streamdata
 end
@@ -54,25 +56,15 @@ function Base.getindex(pool::Pool, instance::Int)
 end
 
 function Base.getindex(pool::Pool, i::Colon)
-    data = DataFrame()
+    data = pool.N()
     for i=1:useble_length(pool)
         push!(data, pool[i])
     end
-    #=
-    data = DataFrame()
-    for i=1:size(pool.data, 1)
-        for j=1:size(pool.data[i], 1)
-            if pool.mapping[i][j]
-                push!(data, pool.data[i][j, :])
-            end
-        end
-    end
-    =#
     return data
 end
 
 function Base.getindex(pool::Pool, range::UnitRange{Int64})
-    data = DataFrame()
+    data = pool.N()
     for i in range
         push!(data, pool[i])
     end
@@ -101,40 +93,35 @@ Base.getindex(pool::Pool, range::UnitRange{Int64}, range2::UnitRange{Int64}) = p
 
 ##Indexing - Using three indexes to move in data through the instances, features, samples
 
-#=
-if sample > size(pool.data, 1)
-        throw(BoundsError(pool.data, sample))
-    else if instance > size(pool.data[sample], 1)
-        throw(BoundsError(pool.data[sample], instance))
-    else if feature > size(pool.data[sample], 2)
-        throw(BoundsError(pool.data[sample][instance], feature))
-    end
-=#
-function Base.getindex(pool::Pool, instance::Int, feature::Colon, sample::Int)
+
+function Base.getindex(pool::Pool, instance::Colon, feature::Colon, sample::Int)
     count = 1
+    data = pool.N()
     for j=1:size(pool.data[sample], 1)
         if pool.mapping[sample][j]
-            if count == instance
-                return pool.data[sample][j, :]
-            end
+                push!(data, pool.data[sample][j, :])
             count += 1
         end
     end
+    return data
 end
 
-#Base.getindex(pool::Pool, instance::Int, feature::Int, sample::Int) = pool[instance, :, sample][feature]
-
-
-function Base.getindex(pool::Pool, instance::Int, feature::Int, sample::Int)    
+function Base.getindex(pool::Pool, instance::Colon, feature::Colon, sample::UnitRange{Int64})
     count = 1
-    for j=1:size(pool.data[sample], 1)
-        if pool.mapping[sample][j]
-            if count == instance
-                return pool.data[sample][j, feature]
+    data = pool.N()
+    for i=range
+        for j=1:size(pool.data[i], 1)
+            if pool.mapping[i][j]
+                if count == instance
+                    push!(data, pool.data[i][j, :])
+                end
+                count += 1
             end
-            count += 1
         end
     end
+    return data
 end
 
-#Base.getindex(pool::Pool, instance::Int, feature::Int, sample::Int) = pool[instance, :, sample]
+Base.getindex(pool::Pool, instance::Colon, feature::Colon, sample::Colon) = pool[:]
+
+Base.getindex(pool::Pool, instance, feature, sample) = pool[:, :, sample][instance, feature]
