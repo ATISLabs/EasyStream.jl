@@ -1,43 +1,24 @@
-abstract type Stream{T} end
-
-mutable struct MemoryStream{T} <: Stream{T}
-    data::T
-    position::Int
-    initial_size::Int
-    batch::Int
+struct Stream
+    source::AbstractSource
+    data_tables::Vector
 end
 
-function MemoryStream(data::T, initial_size::Int, batch::Int) where T
-    if initial_size > size(data, 1)
-        initial_size = size(data, 1)
-        @warn "initial size é maior que o arquivo e será definido para o tamanho do arquivo"
-    end
+Stream(source::AbstractSource) = Stream(source, Vector{Any}())
 
-    if initial_size == 0
-        @warn "initial size é zero"
-    end
+function next(stream::Stream; f::Function = copyall)
+    data = next(stream.source)
 
-    if batch == 0
-        @warn "flux size é zero"
-    end
+    elements = f(size(data)[1], length(stream.data_tables))
 
-    return MemoryStream(data, 0, initial_size, batch)
+    for i=1:length(stream.data_tables)
+        append!(stream.data_tables[i], data[elements[:, i], :])
+    end
 end
 
-next!(buffer::Stream) = nothing
+copyall(qnt_elements, qnt_tables) = ones(Bool, qnt_elements, qnt_tables)
 
-function next!(stream::MemoryStream)
-    if stream.position >= size(stream.data, 1)
-        return nothing
+function publish(stream::Stream, data_tables...)
+    for data_table in data_tables
+        push!(stream.data_tables, data_table)
     end
-
-    if stream.position < stream.initial_size
-        stream.position = stream.initial_size
-        index = 1:stream.initial_size
-    else
-        index = (stream.position + 1):(stream.position + stream.batch)
-        stream.position = stream.position + stream.batch
-    end
-
-    return stream.data[index, :]
 end
