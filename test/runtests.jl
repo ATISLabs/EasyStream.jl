@@ -1,24 +1,33 @@
 using EasyStream
 using Test
 
-using CSV
-using Tables
+stream = EasyStream.Dataset1CDT(5)
 
-const defdir = joinpath(dirname(@__FILE__), "..", "datasets")
+filter = EasyStream.FilterModifier([:Column1, :Column1])
 
-filename = "$(defdir)/synthetic/UG_2C_5D.csv"
+EasyStream.push!(stream, filter)
 
-conn = EasyStream.TablesConnector(filename)
+EasyStream.listen(stream)
 
-source = EasyStream.BatchStream(conn, 5)
 
-a= EasyStream.listen(source)
 
 
 using DataFrames
 
-DataFrame(a)
+x = stream.connector.rows[1]
 
-using CSV
 
-CSV.File(filename; header = false)
+
+values1 = DataFrame[]
+
+push!(values1, DataFrame(x))
+
+DataFrame(values1)
+
+w = vcat(values1...)
+
+
+w
+
+
+select!(w, :Column1)

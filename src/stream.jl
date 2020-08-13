@@ -1,8 +1,14 @@
 abstract type AbstractStream end
 
+function Base.push!(stream::AbstractStream, modifier::Modifier)
+    push!(stream.modifiers, modifier)
+    return nothing
+end
+
 struct BatchStream <: AbstractStream
     connector::AbstractConnector
     batch::Int
+    modifiers::Array{Modifier}
 end
 
 function BatchStream(conn::AbstractConnector; batch::Int = 1)
@@ -10,21 +16,26 @@ function BatchStream(conn::AbstractConnector; batch::Int = 1)
         @warn "flux size é zero"
     end
 
-    return Source(conn, batch)
+    return BatchStream(conn, batch, Modifier[])
 end
 
-function listen(source::BatchStream)::DataFrame
-    if !hasnext(source.connector)
+function listen(stream::BatchStream)::DataFrame
+    if !hasnext(stream.connector)
         return nothing
     end
 
-    values = eltype(source.connector.rows)[]
+    values = DataFrame[]
 
-    for i = 1:source.batch
-        !hasnext(source.connector) ? break : nothing
+    for i = 1:stream.batch
+        !hasnext(stream.connector) ? break : nothing
 
-        push!(values, next(source.connector))
+        data = next(stream.connector)
+        for modifier in stream.modifiers
+            apply!(modifier, data)
+        end
+        
+        push!(values, data)
     end
 
-    return DataFrame(values)
+    return vcat(values...)
 end
