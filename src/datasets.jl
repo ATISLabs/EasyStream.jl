@@ -23,7 +23,7 @@ function Dataset1CDT(batch::Int)::BatchStream
 
     conn = EasyStream.TablesConnector(data)
 
-    stream = BatchStream(conn, batch)
+    stream = BatchStream(conn; batch = batch)
 
     return stream
 end
