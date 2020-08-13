@@ -18,7 +18,7 @@ function next(conn::AbstractConnector)
 
     conn.state += 1
 
-    return conn.rows[conn.state]
+    return DataFrame(conn.rows[conn.state])
 end
 
 Base.length(conn::TablesConnector) = length(conn.rows)
