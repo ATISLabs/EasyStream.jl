@@ -1,5 +1,11 @@
 abstract type AbstractStream end
 
+function Base.iterate(stream::AbstractStream, state = 1)
+    data = listen(stream)
+
+    return isempty(data) ? nothing : (data, state+1)
+end
+
 function Base.push!(stream::AbstractStream, modifier::Modifier)
     push!(stream.modifiers, modifier)
     return nothing
@@ -21,7 +27,7 @@ end
 
 function listen(stream::BatchStream)::DataFrame
     if !hasnext(stream.connector)
-        return nothing
+        return DataFrame()
     end
 
     values = DataFrame[]
