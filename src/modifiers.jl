@@ -2,6 +2,20 @@ using Random
 
 abstract type Modifier end
 
+struct Modifiers <: Modifier
+    modifiers::Array{Modifier}
+end
+
+Modifiers(modifiers::Modifier ...) = Modifiers([modifiers...])
+
+function apply!(modifiers::Modifiers, data::DataFrame, event::Int)
+    for modifier in modifiers.modifiers
+        apply!(modifier, data, event)
+    end
+
+    return nothing
+end
+
 struct NoiseModifier <: Modifier
     seed::Random.MersenneTwister
     attribute::Float64 # The fraction of attribute values to disturb
