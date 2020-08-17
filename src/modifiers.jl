@@ -10,7 +10,7 @@ end
 NoiseModifier(attribute::Float64, seed::Int) = NoiseModifier(Random.seed!(seed), attribute)
 NoiseModifier(attribute::Float64) = NoiseModifier(andom.default_rng(), attribute)
 
-function apply!(modifier::NoiseModifier, data::DataFrame)
+function apply!(modifier::NoiseModifier, data::DataFrame, event::Int)
     return nothing
 end
 
@@ -21,7 +21,7 @@ end
 #TODO: Verificar se tem colunas duplicatas
 FilterModifier(columns::Symbol...) = FilterModifier(columns)
 
-function apply!(modifier::FilterModifier, data::DataFrame)
+function apply!(modifier::FilterModifier, data::DataFrame, event::Int)
     columns = Symbol[]
     for col in modifier.columns
         #TODO: Não ficou boa essa checagem.

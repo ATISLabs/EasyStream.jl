@@ -11,10 +11,15 @@ function Base.push!(stream::AbstractStream, modifier::Modifier)
     return nothing
 end
 
-struct BatchStream <: AbstractStream
+function increment(stream::AbstractStream)
+    stream.events += 1 
+    return nothing
+end
+mutable struct BatchStream <: AbstractStream
     connector::AbstractConnector
     batch::Int
     modifiers::Array{Modifier}
+    events::Int
 end
 
 function BatchStream(conn::AbstractConnector; batch::Int = 1)
@@ -22,7 +27,7 @@ function BatchStream(conn::AbstractConnector; batch::Int = 1)
         @warn "flux size é zero"
     end
 
-    return BatchStream(conn, batch, Modifier[])
+    return BatchStream(conn, batch, Modifier[], 0)
 end
 
 function listen(stream::BatchStream)::DataFrame
@@ -30,6 +35,7 @@ function listen(stream::BatchStream)::DataFrame
         return DataFrame()
     end
 
+    increment(stream)
     values = DataFrame[]
 
     for i = 1:stream.batch
@@ -37,7 +43,7 @@ function listen(stream::BatchStream)::DataFrame
 
         data = next(stream.connector)
         for modifier in stream.modifiers
-            apply!(modifier, data)
+            apply!(modifier, data, stream.events)
         end
         
         push!(values, data)
