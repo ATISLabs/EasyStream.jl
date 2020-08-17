@@ -74,3 +74,7 @@ function IncrementalVirtualDriftModifier(vetor::Dict{Symbol, T}, filter::Functio
 
     return Modifiers(modifiers)
 end
+
+function SuddenVirtualDriftModifier(vetor::Dict{Symbol, T}, filter::Function; c2 = 0.0)::Modifiers where T <: Number
+    return IncrementalVirtualDriftModifier(vetor, filter; c1 = 1.0, c2 = c2)
+end
