@@ -33,7 +33,7 @@ struct FilterModifier <: Modifier
 end
 
 #TODO: Verificar se tem colunas duplicatas
-FilterModifier(columns::Symbol...) = FilterModifier(columns)
+FilterModifier(columns::Symbol...) = FilterModifier([columns...])
 
 function apply!(modifier::FilterModifier, data::DataFrame, event::Int)
     columns = Symbol[]
