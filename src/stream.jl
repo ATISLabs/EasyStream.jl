@@ -15,6 +15,7 @@ function increment(stream::AbstractStream)
     stream.events += 1 
     return nothing
 end
+
 mutable struct BatchStream <: AbstractStream
     connector::AbstractConnector
     batch::Int
@@ -36,6 +37,7 @@ function listen(stream::BatchStream)::DataFrame
     end
 
     increment(stream)
+
     values = DataFrame[]
 
     for i = 1:stream.batch

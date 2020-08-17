@@ -36,3 +36,15 @@ function apply!(modifier::FilterModifier, data::DataFrame, event::Int)
     select!(data, columns)
     return nothing
 end
+struct DriftModifier <: Modifier
+    column::Symbol
+    filter::Function
+    drift::Function
+end
+
+function apply!(modifier::DriftModifier, data::DataFrame, event::Int)
+    elements = modifier.filter(data)
+    data[elements, modifier.column] = data[elements, modifier.column] .+ modifier.drift(event)
+
+    return nothing
+end
