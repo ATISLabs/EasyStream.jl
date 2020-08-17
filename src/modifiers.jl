@@ -39,7 +39,7 @@ function apply!(modifier::FilterModifier, data::DataFrame, event::Int)
     columns = Symbol[]
     for col in modifier.columns
         #TODO: Não ficou boa essa checagem.
-        if !(string(col) in names(data))
+        if !(col in propertynames(data))
             #TODO: Colocar para avisar somente uma única vez do problema.
             @warn "O stream não possui a $col"
         else
