@@ -1,26 +1,26 @@
 using Tables
 
-abstract type AbstractConnector end
+abstract type AbstractConnector{T} end
 
-mutable struct TablesConnector <: AbstractConnector
+mutable struct TablesConnector{T} <: AbstractConnector{T}
     rows
     state::Int
 end
 
-TablesConnector(df::DataFrames.DataFrame) = TablesConnector(Tables.rows(df), 0)
-
-TablesConnector(filename::String) = TablesConnector(CSV.read(filename; header = false))
-
-function next(conn::AbstractConnector)
+function next(conn::AbstractConnector{T})::T where T
     if conn.state >= length(conn)
         return nothing
     end
 
     conn.state += 1
 
-    return DataFrame(conn.rows[conn.state])
+    return T(conn.rows[conn.state])
 end
 
 Base.length(conn::TablesConnector) = length(conn.rows)
 
 hasnext(conn::TablesConnector) = conn.state < length(conn)
+
+TablesConnector(df::DataFrames.DataFrame) = TablesConnector{DataFrame}(Tables.rows(df), 0)
+
+TablesConnector(filename::String) = TablesConnector{DataFrame}(CSV.read(filename; header = false))
