@@ -35,12 +35,14 @@ end
 #TODO: Verificar se tem colunas duplicatas
 FilterModifier(columns::Symbol...) = FilterModifier([columns...])
 
+const EasyWarnings = Set()
+warn(str::String, warnChecker::Set) = str in warnChecker || (@warn str) == nothing && push!(warnChecker, str) 
+
 function apply!(modifier::FilterModifier, data::DataFrame, event::Int)
     columns = Symbol[]
     for col in modifier.columns
         if !(col in propertynames(data))
-            #TODO: Colocar para avisar somente uma única vez do problema.
-            @warn "O stream não possui a $col"
+            warn("O stream não possui a $col", EasyWarnings)
         else
             push!(columns, col)
         end
