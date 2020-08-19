@@ -1,4 +1,4 @@
-using Tables, Random
+using Tables
 
 abstract type AbstractConnector{T} end
 
@@ -22,11 +22,12 @@ Base.length(conn::TablesConnector) = length(conn.rows)
 hasnext(conn::TablesConnector) = conn.state < length(conn)
 
 function TablesConnector(df::T;
-    orderBy = nothing,
-    rev = false, 
-    shuffle = false) where {T}
+    orderBy::Symbol = :default,
+    rev::Bool = false, 
+    shuffle::Bool = false) where {T}
 
-    shuffle == true ? df = df[Random.shuffle(1:size(df,1)), :] : orderBy != nothing && sort!(df, orderBy, rev = rev)
+    shuffle == true ? df = df[Random.shuffle(1:size(df,1)), :] : nothing
+    orderBy != :default && orderBy in propertynames(df) ? df = sort(df, orderBy, rev = rev) : @warn "A tabela não possui a coluna $orderBy" 
 
     return TablesConnector{T}(Tables.rows(df), 0)
 end
