@@ -1,4 +1,4 @@
-using Tables
+using Tables, StatsBase
 
 abstract type AbstractConnector{T} end
 
@@ -21,6 +21,14 @@ Base.length(conn::TablesConnector) = length(conn.rows)
 
 hasnext(conn::TablesConnector) = conn.state < length(conn)
 
-TablesConnector(df::DataFrames.DataFrame) = TablesConnector{DataFrame}(Tables.rows(df), 0)
+function TablesConnector(df::DataFrames.DataFrame;
+    orderBy = nothing,
+    rev = false, 
+    shuffle = false)  
+
+    shuffle == true ? df = df[StatsBase.shuffle(1:size(df,1)), :] : orderBy != nothing && sort!(df, DataFrames.order(orderBy, rev=rev))
+
+    return TablesConnector{DataFrame}(Tables.rows(df), 0)
+end
 
 TablesConnector(filename::String) = TablesConnector{DataFrame}(CSV.read(filename; header = false))
