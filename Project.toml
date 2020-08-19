@@ -1,6 +1,6 @@
 name = "EasyStream"
 uuid = "ebb30991-6a3b-4324-962c-6bc29053301c"
-authors = ["Pedro Conrado"]
+authors = ["Filipe Braida", "Leandro Alvim", "Pedro Conrado"]
 version = "0.1.0"
 
 [deps]
