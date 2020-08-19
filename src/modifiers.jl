@@ -65,7 +65,7 @@ end
 
 sigmoid(x; c1 = 1.0, c2 = 0.0) = 1 / (1 + ℯ ^ (-c1 * (x - c2)))
 
-function IncrementalVirtualDriftModifier(vetor::Dict{Symbol, T}, filter::Function; c1 = 1.0, c2 = 0.0)::Modifiers where T <: Number
+function IncrementalDriftModifier(vetor::Dict{Symbol, T}, filter::Function; c1 = 1.0, c2 = 0.0)::Modifiers where T <: Number
     modifiers = EasyStream.Modifier[]
     for (column, value) in vetor
         drift = DriftModifier(column, filter, x -> value .* sigmoid(x; c1 = c1, c2 = c2))
@@ -75,6 +75,6 @@ function IncrementalVirtualDriftModifier(vetor::Dict{Symbol, T}, filter::Functio
     return Modifiers(modifiers)
 end
 
-function SuddenVirtualDriftModifier(vetor::Dict{Symbol, T}, filter::Function; c2 = 0.0)::Modifiers where T <: Number
-    return IncrementalVirtualDriftModifier(vetor, filter; c1 = 1.0, c2 = c2)
+function SuddenDriftModifier(vetor::Dict{Symbol, T}, filter::Function; c2 = 0.0)::Modifiers where T <: Number
+    return IncrementalDriftModifier(vetor, filter; c1 = 1.0, c2 = c2)
 end
