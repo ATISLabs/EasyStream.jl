@@ -21,6 +21,15 @@ Base.length(conn::TablesConnector) = length(conn.rows)
 
 hasnext(conn::TablesConnector) = conn.state < length(conn)
 
-TablesConnector(df::DataFrames.DataFrame) = TablesConnector{DataFrame}(Tables.rows(df), 0)
+function TablesConnector(df::T;
+    orderBy::Symbol = :default,
+    rev::Bool = false, 
+    shuffle::Bool = false) where {T}
+
+    shuffle == true ? df = df[Random.shuffle(1:size(df,1)), :] : nothing
+    orderBy != :default && orderBy in propertynames(df) ? df = sort(df, orderBy, rev = rev) : @warn "A tabela não possui a coluna $orderBy" 
+
+    return TablesConnector{T}(Tables.rows(df), 0)
+end
 
 TablesConnector(filename::String) = TablesConnector{DataFrame}(CSV.read(filename; header = false))
