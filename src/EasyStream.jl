@@ -10,6 +10,8 @@ include("stream.jl")
 
 include("datasets.jl")
 
+include("drifts.jl")
+
 export clear!, reset!
 
 end # module
