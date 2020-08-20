@@ -1,35 +1,39 @@
 using Tables
 
-abstract type AbstractConnector{T} end
+abstract type AbstractConnector end
 
-mutable struct TablesConnector{T} <: AbstractConnector{T}
+mutable struct TablesConnector <: AbstractConnector
     rows
     state::Int
 end
 
-function next(conn::AbstractConnector{T})::T where T
+function next(conn::AbstractConnector)
     if conn.state >= length(conn)
         return nothing
     end
 
     conn.state += 1
 
-    return T(conn.rows[conn.state])
+    return DataFrame([conn.rows[conn.state]])
 end
 
 Base.length(conn::TablesConnector) = length(conn.rows)
 
 hasnext(conn::TablesConnector) = conn.state < length(conn)
 
-function TablesConnector(df::T;
+function TablesConnector(data;
     orderBy::Symbol = :default,
     rev::Bool = false, 
-    shuffle::Bool = false) where {T}
+    shuffle::Bool = false)
 
-    shuffle == true ? df = df[Random.shuffle(1:size(df,1)), :] : nothing
-    orderBy != :default && orderBy in propertynames(df) ? df = sort(df, orderBy, rev = rev) : @warn "A tabela não possui a coluna $orderBy" 
+    if !Tables.istable(data)
+        @error "the data must be of type Tables"
+    end
 
-    return TablesConnector{T}(Tables.rows(df), 0)
+    shuffle == true ? data = data[Random.shuffle(1:size(data,1)), :] : nothing
+    orderBy != :default && orderBy in propertynames(data) ? data = sort(data, orderBy, rev = rev) : @warn "A tabela não possui a coluna $orderBy" 
+
+    return TablesConnector(Tables.rows(data), 0)
 end
 
-TablesConnector(filename::String) = TablesConnector{DataFrame}(CSV.read(filename; header = false))
+TablesConnector(filename::String) = TablesConnector(CSV.read(filename; header = false))

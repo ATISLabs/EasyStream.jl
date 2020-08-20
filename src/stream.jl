@@ -1,4 +1,4 @@
-abstract type AbstractStream{T} end
+abstract type AbstractStream end
 
 function Base.iterate(stream::AbstractStream, state = 1)
     data = listen(stream)
@@ -16,8 +16,8 @@ function increment(stream::AbstractStream)
     return nothing
 end
 
-mutable struct BatchStream{T} <: AbstractStream{T}
-    connector::AbstractConnector{T}
+mutable struct BatchStream <: AbstractStream
+    connector::AbstractConnector
     batch::Int
     modifiers::Array{Modifier}
     events::Int
@@ -31,14 +31,14 @@ function BatchStream(conn::AbstractConnector; batch::Int = 1)
     return BatchStream(conn, batch, Modifier[], 0)
 end
 
-function listen(stream::BatchStream{T})::T where T
+function listen(stream::BatchStream)::DataFrame
     if !hasnext(stream.connector)
-        return T()
+        return DataFrame()
     end
 
     increment(stream)
 
-    values = T[]
+    values = DataFrame[]
 
     for i = 1:stream.batch
         !hasnext(stream.connector) ? break : nothing
