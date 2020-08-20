@@ -37,3 +37,5 @@ function TablesConnector(data;
 end
 
 TablesConnector(filename::String) = TablesConnector(CSV.read(filename; header = false))
+
+reset!(conn::TablesConnector) = conn.state = 0

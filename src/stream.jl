@@ -8,6 +8,23 @@ end
 
 function Base.push!(stream::AbstractStream, modifier::Modifier)
     push!(stream.modifiers, modifier)
+
+    return nothing
+end
+
+function clear!(stream::AbstractStream)
+    for i = 1:length(stream.modifiers)
+        pop!(stream.modifiers)
+    end
+
+    return nothing
+end
+
+function reset!(stream::AbstractStream)
+    clear!(stream)
+    reset!(stream.connector)
+    stream.events = 0
+
     return nothing
 end
 
