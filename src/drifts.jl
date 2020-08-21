@@ -1,14 +1,11 @@
-struct DriftModifier <: Modifier
-    column::Symbol
-    filter::Function
-    drift::Function
-end
+function DriftModifier(column::Symbol, filter::Function, drift::Function)
+    function f(data, event)
+        elements = filter(data)
+        data[elements, column] = data[elements, column] .+ drift(event)
+        return nothing
+    end
 
-function apply!(modifier::DriftModifier, data::DataFrame, event::Int)
-    elements = modifier.filter(data)
-    data[elements, modifier.column] = data[elements, modifier.column] .+ modifier.drift(event)
-
-    return nothing
+    return AlterDataModifier(f)
 end
 
 sigmoid(x; c1 = 1.0, c2 = 0.0) = 1 / (1 + ℯ ^ (-c1 * (x - c2)))
