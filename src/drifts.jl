@@ -1,19 +1,28 @@
-function DriftModifier(column::Symbol, filter::Function, drift::Function)
+function DriftModifier(filter::Function, drift::Function)
     function f(data, event)
         elements = filter(data)
-        data[elements, column] = data[elements, column] .+ drift(event)
+
+        if length(elements) > 0
+            df = @view data[elements, :]
+            drift(df, event)
+        end
         return nothing
     end
 
-    return AlterDataModifier(f)
+    AlterDataModifier(f)
 end
 
 sigmoid(x; c1 = 1.0, c2 = 0.0) = 1 / (1 + ℯ ^ (-c1 * (x - c2)))
 
+function ClassDriftModifier(column::Symbol, value::T, drift::Function) where T <: Number
+    return DriftModifier((data) -> findall(r-> r == value, data[:, column]), drift)
+end
+
 function IncrementalDriftModifier(vetor::Dict{Symbol, T}, filter::Function; c1 = 1.0, c2 = 0.0)::Modifiers where T <: Number
     modifiers = EasyStream.Modifier[]
     for (column, value) in vetor
-        drift = DriftModifier(column, filter, x -> value .* sigmoid(x; c1 = c1, c2 = c2))
+        drift = DriftModifier(filter, (data, event) -> 
+                                        data[:, column] = data[:, column] .+ value .* sigmoid(event; c1 = c1, c2 = c2))
         push!(modifiers, drift)
     end
 
