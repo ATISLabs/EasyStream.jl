@@ -31,7 +31,7 @@ function TablesConnector(data;
     end
 
     shuffle == true ? data = data[Random.shuffle(1:size(data,1)), :] : nothing
-    orderBy != :default && orderBy in propertynames(data) ? data = sort(data, orderBy, rev = rev) : @warn "A tabela não possui a coluna $orderBy" 
+    orderBy != :default && (orderBy in propertynames(data) ? data = sort(data, orderBy, rev = rev) : @warn "A tabela não possui a coluna $orderBy")
 
     return TablesConnector(Tables.rows(data), 0)
 end
