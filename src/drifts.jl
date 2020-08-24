@@ -22,7 +22,7 @@ function IncrementalDriftModifier(vetor::Dict{Symbol, T}, filter::Function; c1 =
     modifiers = EasyStream.Modifier[]
     for (column, value) in vetor
         drift = DriftModifier(filter, (data, event) -> 
-                                        data[:, column] = data[:, column] .+ value .* sigmoid(event; c1 = c1, c2 = c2))
+                                        data[:, column] = data[:, column] .+ value .* sigmoid(event.time; c1 = c1, c2 = c2))
         push!(modifiers, drift)
     end
 

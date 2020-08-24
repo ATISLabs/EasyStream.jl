@@ -8,7 +8,7 @@ end
 
 Modifiers(modifiers::Modifier ...) = Modifiers([modifiers...])
 
-function apply!(modifiers::Modifiers, data::DataFrame, event::Int)
+function apply!(modifiers::Modifiers, data::DataFrame, event::Event)
     for modifier in modifiers.modifiers
         apply!(modifier, data, event)
     end
@@ -24,7 +24,7 @@ end
 NoiseModifier(attribute::Float64, seed::Int) = NoiseModifier(Random.seed!(seed), attribute)
 NoiseModifier(attribute::Float64) = NoiseModifier(andom.default_rng(), attribute)
 
-function apply!(modifier::NoiseModifier, data::DataFrame, event::Int)
+function apply!(modifier::NoiseModifier, data::DataFrame, event::Event)
     return nothing
 end
 
@@ -35,7 +35,7 @@ end
 #TODO: Verificar se tem colunas duplicatas
 FilterModifier(columns::Symbol...) = FilterModifier([columns...])
 
-function apply!(modifier::FilterModifier, data::DataFrame, event::Int)
+function apply!(modifier::FilterModifier, data::DataFrame, event::Event)
     columns = Symbol[]
     for col in modifier.columns
         if !(col in propertynames(data))
@@ -54,7 +54,7 @@ struct AlterDataModifier <: Modifier
     alter!::Function
 end
 
-function apply!(modifier::AlterDataModifier, data::DataFrame, event::Int)
+function apply!(modifier::AlterDataModifier, data::DataFrame, event::Event)
     modifier.alter!(data, event)
 
     return nothing

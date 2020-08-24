@@ -4,6 +4,8 @@ using CSV
 using DataFrames
 
 include("connector.jl")
+include("event.jl")
+
 include("modifiers.jl")
 
 include("stream.jl")

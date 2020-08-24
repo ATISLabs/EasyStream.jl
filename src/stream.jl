@@ -1,3 +1,8 @@
+function increment(event::Event)
+    event.time += 1
+    nothing
+end
+
 abstract type AbstractStream end
 
 function Base.iterate(stream::AbstractStream, state = 1)
@@ -28,16 +33,13 @@ function reset!(stream::AbstractStream)
     return nothing
 end
 
-function increment(stream::AbstractStream)
-    stream.events += 1 
-    return nothing
-end
+increment(stream::AbstractStream) = increment(stream.event)
 
 mutable struct BatchStream <: AbstractStream
     connector::AbstractConnector
     batch::Int
     modifiers::Array{Modifier}
-    events::Int
+    event::Event
 end
 
 function BatchStream(conn::AbstractConnector; batch::Int = 1)
@@ -45,7 +47,7 @@ function BatchStream(conn::AbstractConnector; batch::Int = 1)
         @warn "flux size é zero"
     end
 
-    return BatchStream(conn, batch, Modifier[], 0)
+    return BatchStream(conn, batch, Modifier[], Event(conn.args))
 end
 
 function listen(stream::BatchStream)::DataFrame
@@ -62,30 +64,11 @@ function listen(stream::BatchStream)::DataFrame
 
         data = next(stream.connector)
         for modifier in stream.modifiers
-            apply!(modifier, data, stream.events)
+            apply!(modifier, data, stream.event)
         end
         
         push!(values, data)
     end
 
     return vcat(values...)
-end
-
-struct Range
-    state::Int
-    stream::AbstractStream
-end
-
-function Base.iterate(range::Range, state = 1)
-    if state > range.state
-        return nothing
-    end
-
-    data = listen(range.stream)
-
-    return isempty(data) ? nothing : (data, state+1)
-end
-
-function range(value::Int, stream::AbstractStream)
-    return Range(value, stream)
 end

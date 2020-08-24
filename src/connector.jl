@@ -9,6 +9,7 @@ reset!(conn::AbstractConnector) = nothing
 mutable struct TablesConnector <: AbstractConnector
     rows
     state::Int
+    args::Dict{String, Any}
 end
 
 function TablesConnector(data; shuffle::Bool = false)
@@ -20,7 +21,7 @@ function TablesConnector(data; shuffle::Bool = false)
         data = data[Random.shuffle(1:size(data,1)), :]
     end
 
-    return TablesConnector(Tables.rows(data), 0)
+    return TablesConnector(Tables.rows(data), 0, Dict{String, Any}())
 end
 
 function TablesConnector(data, orderBy::Symbol; rev::Bool = false)
