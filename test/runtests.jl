@@ -1,21 +1,40 @@
 using EasyStream
+using DataFrames
 using Test
 
 @testset "sort and shuffle functionalities" begin
-    df = EasyStream.DataFrame(x = [1, 2, 3, 4, 5, 6], y = [6, 5, 4, 3, 2, 1])
+    df = DataFrame(x = [1, 2, 3, 4, 5, 6], y = [6, 5, 4, 3, 2, 1])
     
-    cnn = EasyStream.TablesConnector(df, orderBy = :y)
-    for x in df[:,1] 
-        @test EasyStream.next(cnn)[2][1] == x
+    conn = EasyStream.TablesConnector(df, :x)
+    for x in df[:, :x]
+        batch = EasyStream.next(conn)
+        @test batch[1, :x] == x
     end
 
-    cnn = EasyStream.TablesConnector(df, orderBy = :x, rev = true)
-    for y in df[:,2] 
-        @test EasyStream.next(cnn)[1][1] == y
+    conn = EasyStream.TablesConnector(df, :x, rev = true)
+    for x in df[:, :x]
+        batch = EasyStream.next(conn)
+        @test batch[1, :y] == x
     end
 
-    missing_names = [:c, :d, :e]
-    for name in missing_names 
-        @test_logs (:warn,"A tabela não possui a coluna $name") EasyStream.TablesConnector(df, orderBy = name)
+    missing_names = [:w, :column]
+    for name in missing_names
+        @test_logs (:warn,"The dataset doesn't have the column $name") EasyStream.TablesConnector(df, name)
      end
+end
+
+@testset "shuffle functionalities" begin
+    df = DataFrame(x = [1:100 ...])
+    
+    conn = EasyStream.TablesConnector(df, shuffle = true)
+    diff_elements = 0
+
+    for x in df[:, :x]
+        batch = EasyStream.next(conn)
+        if batch[1, :x] != x
+            diff_elements += 1
+        end
+    end
+
+    @test diff_elements > 0
 end
