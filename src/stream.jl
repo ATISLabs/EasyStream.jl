@@ -43,8 +43,8 @@ mutable struct BatchStream <: AbstractStream
 end
 
 function BatchStream(conn::AbstractConnector; batch::Int = 1)
-    if batch == 0
-        @warn "flux size é zero"
+    if batch <= 0
+        throw(ArgumentError("batch must be greater than 0"))
     end
 
     return BatchStream(conn, batch, Modifier[], Event(conn.args))
