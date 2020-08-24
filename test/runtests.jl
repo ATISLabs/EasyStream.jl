@@ -16,6 +16,6 @@ using Test
 
     missing_names = [:c, :d, :e]
     for name in missing_names
-        @test_logs (:warn,"A tabela não possui a coluna $name") EasyStream.TablesConnector(df, name)
+        @test_logs (:warn,"The dataset doesn't have the column $name") EasyStream.TablesConnector(df, name)
      end
 end
