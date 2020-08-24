@@ -38,7 +38,7 @@ end
 
 function TablesConnector(data, orderBy::Symbol; rev::Bool = false)
 
-    orderBy != :default && (orderBy in propertynames(data) ? data = sort(data, orderBy, rev = rev) : @warn "A tabela não possui a coluna $orderBy")
+    orderBy in propertynames(data ? data = sort(data, orderBy, rev = rev) : @warn "A tabela não possui a coluna $orderBy")
 
     return TablesConnector(data)
 end
