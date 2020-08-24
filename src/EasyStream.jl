@@ -8,6 +8,8 @@ include("modifiers.jl")
 
 include("stream.jl")
 
+include("others.jl")
+
 include("datasets.jl")
 
 include("drifts.jl")
