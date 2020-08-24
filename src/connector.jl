@@ -23,22 +23,26 @@ hasnext(conn::TablesConnector) = conn.state < length(conn)
 
 function TablesConnector(data)
     if !Tables.istable(data)
-        @error "the data must be of type Tables"
+        @error "The dataset must have the Tables.jl interface"
     end
 
     return TablesConnector(Tables.rows(data), 0)
 end
 
 function TablesConnector(data, shuffle::Bool)
-
-    shuffle == true ? data = data[Random.shuffle(1:size(data,1)), :] : nothing
+    if shuffle
+        data = data[Random.shuffle(1:size(data,1)), :]
+    end
 
     return TablesConnector(data)
 end
 
 function TablesConnector(data, orderBy::Symbol; rev::Bool = false)
-
-    orderBy in propertynames(data ? data = sort(data, orderBy, rev = rev) : @warn "A tabela não possui a coluna $orderBy")
+    if orderBy in propertynames(data)
+         data = sort(data, orderBy, rev = rev)
+    else 
+        @warn "The dataset doesn't have the column $orderBy"
+    end
 
     return TablesConnector(data)
 end
