@@ -1,20 +1,23 @@
 using EasyStream
+using DataFrames
 using Test
 
-@testset "sort and shuffle functionalities" begin
-    df = EasyStream.DataFrame(x = [1, 2, 3, 4, 5, 6], y = [6, 5, 4, 3, 2, 1])
+@testset "sort functionalities" begin
+    df = DataFrame(x = [1, 2, 3, 4, 5, 6], y = [6, 5, 4, 3, 2, 1])
     
-    cnn = EasyStream.TablesConnector(df, :y)
-    for x in df[:,1]
-        @test EasyStream.next(cnn)[2][1] == x
+    conn = EasyStream.TablesConnector(df, :x)
+    for x in df[:, :x]
+        batch = EasyStream.next(conn)
+        @test batch[1, :x] == x
     end
 
-    cnn = EasyStream.TablesConnector(df, :x, rev = true)
-    for y in df[:,2]
-        @test EasyStream.next(cnn)[1][1] == y
+    conn = EasyStream.TablesConnector(df, :x, rev = true)
+    for x in df[:, :x]
+        batch = EasyStream.next(conn)
+        @test batch[1, :y] == x
     end
 
-    missing_names = [:c, :d, :e]
+    missing_names = [:w, :column]
     for name in missing_names
         @test_logs (:warn,"The dataset doesn't have the column $name") EasyStream.TablesConnector(df, name)
      end
