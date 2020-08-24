@@ -39,8 +39,7 @@ function apply!(modifier::FilterModifier, data::DataFrame, event::Event)
     columns = Symbol[]
     for col in modifier.columns
         if !(col in propertynames(data))
-            #TODO: Colocar para avisar somente uma única vez do problema.
-            @warn "O stream não possui a $col"
+            throw(ArgumentError("stream doesn't have the column $col"))
         else
             push!(columns, col)
         end

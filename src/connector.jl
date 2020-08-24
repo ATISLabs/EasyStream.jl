@@ -14,7 +14,7 @@ end
 
 function TablesConnector(data; shuffle::Bool = false)
     if !Tables.istable(data)
-        @error "The dataset must have the Tables.jl interface"
+        throw(ArgumentError("data must have the Tables.jl interface"))
     end
 
     if shuffle
@@ -25,11 +25,11 @@ function TablesConnector(data; shuffle::Bool = false)
 end
 
 function TablesConnector(data, orderBy::Symbol; rev::Bool = false)
-    if orderBy in propertynames(data)
-         data = sort(data, orderBy, rev = rev)
-    else 
-        @warn "The dataset doesn't have the column $orderBy"
+    if !(orderBy in propertynames(data))
+        throw(ArgumentError("data doesn't have the column $orderBy"))
     end
+
+    data = sort(data, orderBy, rev = rev)
 
     return TablesConnector(data)
 end

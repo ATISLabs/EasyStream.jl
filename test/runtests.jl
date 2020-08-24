@@ -19,7 +19,7 @@ using Test
 
     missing_names = [:w, :column]
     for name in missing_names
-        @test_logs (:warn,"The dataset doesn't have the column $name") EasyStream.TablesConnector(df, name)
+        @test_throws ArgumentError EasyStream.TablesConnector(df, name)
      end
 end
 
