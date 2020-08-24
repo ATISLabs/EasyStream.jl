@@ -21,20 +21,16 @@ Base.length(conn::TablesConnector) = length(conn.rows)
 
 hasnext(conn::TablesConnector) = conn.state < length(conn)
 
-function TablesConnector(data)
+function TablesConnector(data; shuffle::Bool = false)
     if !Tables.istable(data)
         @error "The dataset must have the Tables.jl interface"
     end
 
-    return TablesConnector(Tables.rows(data), 0)
-end
-
-function TablesConnector(data, shuffle::Bool)
     if shuffle
         data = data[Random.shuffle(1:size(data,1)), :]
     end
 
-    return TablesConnector(data)
+    return TablesConnector(Tables.rows(data), 0)
 end
 
 function TablesConnector(data, orderBy::Symbol; rev::Bool = false)
