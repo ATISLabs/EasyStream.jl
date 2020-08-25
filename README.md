@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/ATISLabs/EasyStream.jl/branch/master/graph/badge.svg?token=13TrPsgakO)](https://codecov.io/gh/ATISLabs/EasyStream.jl)
+
 # EasyStream
 
 Esse pacote tem o intuito de facilitar o uso de stream.
