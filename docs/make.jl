@@ -6,12 +6,12 @@ makedocs(;
     pages=[
         "Home" => "index.md",
     ],
-    repo="https://github.com/Conradox/EasyStream.jl/blob/{commit}{path}#L{line}",
+    repo="https://github.com/ATISLabs/EasyStream.jl/blob/{commit}{path}#L{line}",
     sitename="EasyStream.jl",
-    authors="Pedro Conrado",
+    authors="ATISLabs",
     assets=String[],
 )
 
 deploydocs(;
-    repo="github.com/Conradox/EasyStream.jl",
+    repo="github.com/ATISLabs/EasyStream.jl",
 )
