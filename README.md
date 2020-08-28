@@ -1,6 +1,10 @@
-[![codecov](https://codecov.io/gh/ATISLabs/EasyStream.jl/branch/master/graph/badge.svg?token=13TrPsgakO)](https://codecov.io/gh/ATISLabs/EasyStream.jl)
-
 # EasyStream
+
+*Data Stream in Julia*
+
+| **Documentation**                                                               | **Build Status**                                                                                |
+|:-------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------:|
+| Em breve| [![][codecov-img]][codecov-url] |
 
 O EasyStream.jl tem como objetivo criar uma interface simples para trabalhar com stream, atuando como exemplo em problemas relacionados como o concept drift. Nas próximas seções serão discutidos os elementos básicos do framework.
 
@@ -129,3 +133,6 @@ O dado irá receber um _DataFrame_ e o evento será uma estrutura onde possuirá
 
 ## Referências
 Krawczyk, Bartosz, et al. 'Ensemble learning for data stream analysis: A survey.' Information Fusion 37 (2017): 132-156.
+
+[codecov-img]: https://codecov.io/gh/ATISLabs/EasyStream.jl/branch/master/graph/badge.svg?token=13TrPsgakO
+[codecov-url]: https://codecov.io/gh/ATISLabs/EasyStream.jl
