@@ -28,7 +28,7 @@ end
 function reset!(stream::AbstractStream)
     clear!(stream)
     reset!(stream.connector)
-    stream.events = 0
+    stream.event.time = 0
 
     return nothing
 end
