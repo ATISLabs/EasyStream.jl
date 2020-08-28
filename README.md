@@ -4,7 +4,7 @@
 
 | **Documentation**                                                               | **Build Status**                                                                                |
 |:-------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------:|
-| [![][docs-dev-img]][docs-dev-url] | [![][codecov-img]][codecov-url] [![][coverage-img]][coverage-url] |
+| [![][docs-dev-img]][docs-dev-url] | [![][travis-img]][travis-url] [![][codecov-img]][codecov-url] [![][coverage-img]][coverage-url] |
 
 O EasyStream.jl tem como objetivo criar uma interface simples para trabalhar com stream, atuando como exemplo em problemas relacionados como o concept drift. Nas próximas seções serão discutidos os elementos básicos do framework.
 
@@ -136,6 +136,9 @@ Krawczyk, Bartosz, et al. 'Ensemble learning for data stream analysis: A survey.
 
 [docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
 [docs-dev-url]: https://atislabs.github.io/EasyStream.jl/
+
+[travis-img]: https://travis-ci.com/ATISLabs/EasyStream.jl.svg?branch=master
+[travis-url]: https://travis-ci.com/ATISLabs/EasyStream.jl
 
 [codecov-img]: https://codecov.io/gh/ATISLabs/EasyStream.jl/branch/master/graph/badge.svg?token=13TrPsgakO
 [codecov-url]: https://codecov.io/gh/ATISLabs/EasyStream.jl
