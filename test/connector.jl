@@ -63,4 +63,19 @@
             @test diff_elements > 0
         end
     end
+
+    @testset "Generator Connector" begin
+        function generator(n_features::Int)        
+            return DataFrame(permutedims([rand() for _ = 1:n_features ]))
+        end
+        
+        n_features = 5
+        conn = EasyStream.GeneratorConnector(generator, n_features)
+        
+        data = EasyStream.next(cnn)
+        
+        @test size(data, 1) == 1
+        @test size(data, 1) == n_features
+        
+    end
 end
