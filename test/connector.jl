@@ -12,16 +12,21 @@
                 @test  batch[1, j] == df[i, j] 
             end
         end
-
+        
         @test EasyStream.hasnext(conn) == false
+
+        @test EasyStream.next(conn) === nothing
 
         @test length(conn) == size(df, 1)
 
         EasyStream.reset!(conn)
 
         @test conn.state == 0
-    
 
+        array = [1 2 3 4 5; 6 7 8 9 10]
+
+        @test_throws ArgumentError EasyStream.TablesConnector(array)
+        
         @testset "sort functionalities" begin
             
             conn = EasyStream.TablesConnector(df, :x)
