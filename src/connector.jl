@@ -4,43 +4,41 @@ Base.length(conn::AbstractConnector) = Inf
 hasnext(conn::AbstractConnector) = true
 reset!(conn::AbstractConnector) = nothing
 
+abstract type LoopType end
+struct Foward <: LoopType end
+struct Backward <: LoopType end
+struct Yoyo <: LoopType end
+struct None <: LoopType end
+
 mutable struct TablesConnector <: AbstractConnector
     rows
     state::Int
     args::Dict{Symbol, Any}
-    loop::Symbol
+    loop::LoopType
     incremental::Int
 end
 
-function TablesConnector(data; shuffle::Bool = false, loop::Symbol = :none)
+function TablesConnector(data; shuffle::Bool = false, loop::LoopType = None())
 
     if !Tables.istable(data)
         throw(ArgumentError("data must have the Tables.jl interface"))
-    end
-    loopTypes =[:none,:foward,:backward,:yoyo]
-    if !(loop in loopTypes)
-        throw(ArgumentError("Symbol $loop is not valid"))
     end
 
     if shuffle
         data = data[Random.shuffle(1:size(data,1)), :]
     end
-    state = loop == :backward ? size(data, 1) + 1 : 0
-    incremental = loop == :backward ? -1 : 1
+    state = typeof(loop) == typeof(Backward()) ? size(data, 1) + 1 : 0
+    incremental = typeof(loop) == typeof(Backward()) ? -1 : 1
     return TablesConnector(Tables.rows(data), state, Dict{Symbol, Any}(),loop,incremental)
 end
 
 
 
-function TablesConnector(data, orderBy::Symbol; rev::Bool = false, loop::Symbol = :none)
+function TablesConnector(data, orderBy::Symbol; rev::Bool = false, loop::LoopType = None())
     if !(orderBy in propertynames(data))
         throw(ArgumentError("data doesn't have the column $orderBy"))
     end
-    loopTypes =[:none,:foward,:backward,:yoyo]
-    if !(loop in loopTypes)
-        throw(ArgumentError("Symbol $loop is not valid"))
-    end
-    state = loop == :backward ? size(data, 1) + 1 : 0
+
     data = sort(data, orderBy, rev = rev)
     return TablesConnector(data;loop = loop)
 end
@@ -49,34 +47,45 @@ TablesConnector(filename::String) = TablesConnector(CSV.read(filename; header = 
 
 Base.length(conn::TablesConnector) = length(conn.rows)
 function hasnext(conn::TablesConnector)
-    if conn.loop == :none
+    if typeof(conn.loop) == typeof(None())
         return conn.state < length(conn)
-    elseif conn.loop == :foward || conn.loop == :backward ||conn.loop == :yoyo
+    else
         return true
     end
 end
 
-function next(conn::TablesConnector)
-    if conn.loop == :none
-        if conn.state >= length(conn)
-            return nothing
-        end
+function next(conn::TablesConnector) return next(conn,conn.loop) end
 
-        conn.state += 1
-    elseif conn.loop == :foward || conn.loop == :backward
-        conn.state += conn.incremental
-        temp = conn.state % length(conn)
-        conn.state = temp == 0 ? length(conn) : temp
-    elseif conn.loop == :yoyo
-        conn.state += conn.incremental
-        if conn.state == length(conn)
-            conn.incremental *= - 1
-        elseif conn.state == 0
-            conn.state = 2
-            conn.incremental *= - 1
-        end
+function next(conn::TablesConnector,::None)
+    if conn.state >= length(conn)
+        return nothing
+    end
 
+    conn.state += 1
+    return DataFrame([conn.rows[conn.state]])
+end
 
+function next(conn::TablesConnector,::Foward)
+    conn.state += conn.incremental
+    temp = conn.state % length(conn)
+    conn.state = temp == 0 ? length(conn) : temp
+    return DataFrame([conn.rows[conn.state]])
+end
+
+function next(conn::TablesConnector,::Backward)
+    conn.state += conn.incremental
+    temp = conn.state % length(conn)
+    conn.state = temp == 0 ? length(conn) : temp
+    return DataFrame([conn.rows[conn.state]])
+end
+
+function next(conn::TablesConnector,::Yoyo)
+    conn.state += conn.incremental
+    if conn.state == length(conn)
+        conn.incremental *= - 1
+    elseif conn.state == 0
+        conn.state = 2
+        conn.incremental *= - 1
     end
     return DataFrame([conn.rows[conn.state]])
 end
