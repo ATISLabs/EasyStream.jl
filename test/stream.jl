@@ -8,7 +8,7 @@
         for data in stream
             qnt_loops = qnt_loops + 1
         end
-        
+
         EasyStream.reset!(stream)
 
         qnt_loops_reset = 0
@@ -69,5 +69,18 @@
 
         @test i == Int(elements ./ batch)
     end
-end
 
+    @testset "FilterModifier" begin
+
+        df = DataFrame(x = [1, 2, 3, 4, 5, 6], y = [6, 5, 4, 3, 2, 1], z = [6, 5, 4, 3, 2, 1])
+        conn_df = EasyStream.TablesConnector(df);
+        stream = EasyStream.BatchStream(conn_df; batch = 2);
+        filter = EasyStream.FilterModifier([:x, :x, :y])
+        push!(stream, filter)
+
+        stream_filtered = EasyStream.listen(stream)
+
+        @test propertynames(stream_filtered) == [:x, :y]
+        @test propertynames(stream_filtered) != [:x, :x, :y]
+    end
+end
