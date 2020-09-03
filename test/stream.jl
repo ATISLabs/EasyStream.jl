@@ -80,7 +80,8 @@
 
         stream_filtered = EasyStream.listen(stream)
 
-        @test propertynames(stream_filtered) == [:x, :y]
-        @test propertynames(stream_filtered) != [:x, :x, :y]
+        @test (:x in propertynames(stream_filtered)) == true
+        @test (:y in propertynames(stream_filtered)) == true
+        @test (:z in propertynames(stream_filtered)) == false
     end
 end
