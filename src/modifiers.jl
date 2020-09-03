@@ -45,7 +45,7 @@ function apply!(modifier::FilterModifier, data::DataFrame, event::Event)
         end
     end
 
-    select!(data, columns)
+    select!(data, unique(columns))
     return nothing
 end
 
