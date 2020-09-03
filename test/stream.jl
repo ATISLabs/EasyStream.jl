@@ -70,18 +70,4 @@
         @test i == Int(elements ./ batch)
     end
 
-    @testset "FilterModifier" begin
-
-        df = DataFrame(x = [1, 2, 3, 4, 5, 6], y = [6, 5, 4, 3, 2, 1], z = [6, 5, 4, 3, 2, 1])
-        conn_df = EasyStream.TablesConnector(df);
-        stream = EasyStream.BatchStream(conn_df; batch = 2);
-        filter = EasyStream.FilterModifier([:x, :x, :y])
-        push!(stream, filter)
-
-        stream_filtered = EasyStream.listen(stream)
-
-        @test (:x in propertynames(stream_filtered)) == true
-        @test (:y in propertynames(stream_filtered)) == true
-        @test (:z in propertynames(stream_filtered)) == false
-    end
 end
