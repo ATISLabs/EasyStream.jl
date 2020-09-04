@@ -8,7 +8,7 @@
         for data in stream
             qnt_loops = qnt_loops + 1
         end
-        
+
         EasyStream.reset!(stream)
 
         qnt_loops_reset = 0
@@ -69,5 +69,5 @@
 
         @test i == Int(elements ./ batch)
     end
-end
 
+end
