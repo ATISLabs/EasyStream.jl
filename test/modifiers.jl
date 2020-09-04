@@ -21,7 +21,7 @@
     @test (:x in propertynames(stream_filtered)) == true
     @test (:y in propertynames(stream_filtered)) == false
     @test (:z in propertynames(stream_filtered)) == false
-    
-    @test_logs "There are duplicate columns." EasyStream.FilterModifier([:x, :x, :y])
+
+    @test_logs (:warn, "There are duplicate columns.") EasyStream.FilterModifier([:x, :x, :y])
     @test_logs (:warn, "There are duplicate columns.") EasyStream.FilterModifier(:x, :x, :y)
 end

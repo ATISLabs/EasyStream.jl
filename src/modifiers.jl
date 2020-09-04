@@ -35,9 +35,7 @@ struct FilterModifier <: Modifier
 
     function FilterModifier(columns)
         _columns = unique(columns)
-        if length(unique(columns)) != length(columns)
-            @warn "There are duplicate columns."
-        end
+        if length(_columns) != length(columns) @warn "There are duplicate columns." end
         return new(_columns)
     end
 end
