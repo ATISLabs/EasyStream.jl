@@ -32,7 +32,14 @@ end
 
 struct FilterModifier <: Modifier
     columns::Array{Symbol}
-    FilterModifier(columns) = length(unique(columns)) != length(columns) ? throw(MethodError("There are duplicated columns")) : new(columns)
+
+    function FilterModifier(columns)
+        _columns = unique(columns)
+        if length(unique(columns)) != length(columns)
+            @warn "There are duplicate columns."
+        end
+        return new(_columns)
+    end
 end
 
 FilterModifier(columns::Symbol...) = FilterModifier([columns...])
