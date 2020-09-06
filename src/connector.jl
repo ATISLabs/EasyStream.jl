@@ -1,4 +1,5 @@
 using Tables
+using Dates
 
 abstract type AbstractConnector end
 
@@ -12,7 +13,7 @@ mutable struct TablesConnector <: AbstractConnector
     args::Dict{Symbol, Any}
 end
 
-function TablesConnector(data; shuffle::Bool = false)
+function TablesConnector(data; shuffle::Bool = false, timestamp::Bool = false)
     if !Tables.istable(data)
         throw(ArgumentError("data must have the Tables.jl interface"))
     end
@@ -21,17 +22,23 @@ function TablesConnector(data; shuffle::Bool = false)
         data = data[Random.shuffle(1:size(data,1)), :]
     end
 
+    if timestamp
+        rightnow = Dates.now();
+        TimestampModifier = EasyStream.AlterDataModifier((data,event)-> data[:, :timestamp] .= rightnow)
+        apply!(TimestampModifier, data, Event(Dict{Symbol, Any}()))
+    end
+
     return TablesConnector(Tables.rows(data), 0, Dict{Symbol, Any}())
 end
 
-function TablesConnector(data, orderBy::Symbol; rev::Bool = false)
+function TablesConnector(data, orderBy::Symbol; rev::Bool = false, timestamp::Bool = false)
     if !(orderBy in propertynames(data))
         throw(ArgumentError("data doesn't have the column $orderBy"))
     end
 
     data = sort(data, orderBy, rev = rev)
 
-    return TablesConnector(data)
+    return TablesConnector(data, timestamp = timestamp)
 end
 
 TablesConnector(filename::String) = TablesConnector(CSV.read(filename; header = false))
@@ -64,6 +71,6 @@ end
 function next(conn::GeneratorConnector)
     total = 100
     data = conn.generator(;n_samples = total, conn.args...)
-    
+
     return DataFrame(data[1 + Int(floor(rand(1,1)[1] .* size(data)[1])), :])
 end
