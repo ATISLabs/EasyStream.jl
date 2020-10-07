@@ -5,6 +5,8 @@ makedocs(;
     format=Documenter.HTML(),
     pages=[
         "Home" => "index.md",
+        "Stream" => "stream.md",
+        "Modifiers" => "modifiers.md"
     ],
     repo="https://github.com/ATISLabs/EasyStream.jl/blob/{commit}{path}#L{line}",
     sitename="EasyStream.jl",
