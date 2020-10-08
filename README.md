@@ -1,10 +1,8 @@
 <p align="center">
   <img src="docs/src/assets/logo-name.svg" height="300"><br>
 </p>
-
-| **Documentation**                                                               | **Build Status**                                                                                |
-|:-------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------:|
-| [![][docs-dev-img]][docs-dev-url] | [![][travis-img]][travis-url] [![][codecov-img]][codecov-url] [![][coverage-img]][coverage-url] |
+  
+[![][docs-dev-img]][docs-dev-url] [![][travis-img]][travis-url] [![][codecov-img]][codecov-url] [![][coverage-img]][coverage-url] 
 
 ## About
 
