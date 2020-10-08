@@ -6,11 +6,7 @@
 
 ## About
 
-O EasyStream.jl tem como objetivo criar uma interface simples para trabalhar com stream, atuando como exemplo em problemas relacionados como o concept drift. Nas próximas seções serão discutidos os elementos básicos do framework.
-
-## Project goals
-
-- A framework for data stream in a modern programming language.
+EasyStream.jl aims to create a simple interface for working with streams, acting as an example in related problems such as the concept drift.
 
 ## Installation
 
@@ -31,10 +27,6 @@ julia> import Pkg; Pkg.add("EasyStream")
 
 - **STABLE** &mdash; **most recently tagged version of the documentation.** (under construction)
 - [**LATEST**][docs-dev-url] &mdash; *in-development version of the documentation.*
-
-## Tutorials
-
-Under construction.
 
 ## Packages
 
