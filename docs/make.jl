@@ -4,7 +4,7 @@ makedocs(;
     modules=[EasyStream],
     format=Documenter.HTML(),
     pages=[
-        "Home" => "index.md",
+        "Introduction" => "index.md",
         "Stream" => "stream.md",
         "Modifiers" => "modifiers.md"
     ],
