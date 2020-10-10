@@ -10,6 +10,8 @@
 
 O EasyStream.jl tem como objetivo criar uma interface simples para trabalhar com stream, atuando como exemplo em problemas relacionados como o concept drift. Nas próximas seções serão discutidos os elementos básicos do framework.
 
+EasyStream.jl aims to create a simple interface to work with data stream, acting, for example, in Concept Drift related problems. In the next sections we discuss the basic elements of the framework.
+
 ## Installation
 
 Get the latest stable release with Julia's package manager:
@@ -43,5 +45,5 @@ The project is split into various packages:
 
 | Package | Description |
 |:-------:|:------------|
-| [StreamDatasets.jl](https://github.com/ATISLabs/StreamDatasets.jl) | Package with synthetics datasets. (under construction) |
-| [SyntheticDatasets.jl](https://github.com/ATISLabs/SyntheticDatasets.jl) | Packages with stream datasets. |
+| [StreamDatasets.jl](https://github.com/ATISLabs/StreamDatasets.jl) | Package with stream datasets (under construction).|
+| [SyntheticDatasets.jl](https://github.com/ATISLabs/SyntheticDatasets.jl) |Package with synthetics datasets.|
