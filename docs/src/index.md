@@ -8,8 +8,6 @@
 
 ## Overview
 
-O EasyStream.jl tem como objetivo criar uma interface simples para trabalhar com stream, atuando como exemplo em problemas relacionados como o concept drift. Nas próximas seções serão discutidos os elementos básicos do framework.
-
 EasyStream.jl aims to create a simple interface to work with data stream, acting, for example, in Concept Drift related problems. In the next sections we discuss the basic elements of the framework.
 
 ## Installation
